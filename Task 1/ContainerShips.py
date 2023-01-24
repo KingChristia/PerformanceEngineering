@@ -27,24 +27,6 @@ class Container:
 
 # print(Container(20, 2, 20, 1))
 
-class Ship:
-    def __init__(self, length, width, height):
-        self.length = length
-        self.width = width
-        self.height = height
-        self.containers = []
-
-    def addContainer(self, container):
-        self.containers.append(container)
-
-    def getContainers(self):
-        return self.containers
-
-    def findContainer(self, id):
-        for container in self.containers:
-            if container.id == id:
-                return container
-    
 
 #code = id
 def randomContainer():
@@ -82,4 +64,46 @@ def readContainersFromFile():
         containers.append(Container(int(line[1]), int(line[2]), int(line[3]), int(line[0])))
     return containers
 
-(readContainersFromFile())
+# (readContainersFromFile())
+
+class Ship:
+    def __init__(self, length, width, height):
+        self.length = length
+        self.width = width
+        self.height = height
+        self.containers = []
+        #Ingen måte for å sjekke hvilken container som er i hvilken posisjon
+        self.capacity = [length, width, height]
+        
+
+    def addContainer(self, container):
+        if self.capacity[1] >= container.width and self.capacity[2] >= container.height and self.capacity[0] >= container.length:
+            if self.capacity[1] >= container.width and self.capacity[0] >= container.length:
+                self.containers.append(container)
+                self.capacity[1] -= container.width
+                self.capacity[0] -= container.length
+            #Sjekke om det er plass til flere i høyden
+            elif self.capacity[2] >= container.height:
+                self.containers.append(container)
+                self.capacity[0] += self.length - container.length
+                self.capacity[1] += self.width - container.width
+                self.capacity[2] -= container.height
+        else:
+            print("Container does not fit")
+
+    def getContainers(self):
+        return self.containers
+    
+    def removeContainer(self, container):
+        if self.containers.__contains__(container):
+            self.containers.remove(container)
+        
+
+    def findContainer(self, id):
+        for container in self.containers:
+            if self.container.id == id:
+                return container
+    
+newShip = Ship(23, 22, 18)
+newShip.addContainer(randomContainer())
+print(newShip.getContainers())
