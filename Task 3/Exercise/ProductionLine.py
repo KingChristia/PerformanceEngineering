@@ -305,7 +305,7 @@ class Simulation:
                     task1.getLoadBuffer().insertBatch(self.batches.pop(0))
                     heapq.heappush(self.getEventQueue(), Event(self.getCurrentTime(), "load", unit1))
                     print(f"loaded batch to sim at time {self.getCurrentTime()}")
-                    print(f"batches left to load: {len(self.batches)}")
+                    print(f"batches left to load: {len(self.batches)}-------------------------------------------")
                 else:
                     heapq.heappush(self.getEventQueue() , Event(self.getCurrentTime() + 60, "loadBatchesToSimulation", unit1))
 
