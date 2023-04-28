@@ -267,12 +267,12 @@ class Simulation:
             batch = Batches(index)
             wafersToProduce -= batch.getBatchSize()
             self.batches.append(batch)
-            heapq.heappush(self.eventqueue, Event(
-                0, "loadBatchesToSimulation", None))
+            heapq.heappush(self.eventqueue, Event(0, "loadBatchesToSimulation", None))
             index += 1
 
     def getEventQueue(self):
         return self.eventqueue
+    
     def setCurrentTime(self, time):
         self.currentTime = time
 
@@ -283,53 +283,52 @@ class Simulation:
         self.createBucketOfBatches()
         
         while self.getEventQueue():
-            print(f"Current time: {self.currentTime}")
             # Sjekker eventqueue om neste action er å laste inn til første input
             self.setCurrentTime(self.getFirst().getTime())
             currentEvent = self.eventqueue.pop(0)
             currentUnit = currentEvent.getUnit()
             if currentEvent.action == "loadBatchesToSimulation":
-                
                 # Sjekker om det er plass i første inputbuffer
                 if self.productionLine.getUnits()[0].getTasks()[0].getBuffer().canInsertBatch(self.batches[0]):
                     # Inserte den i første buffer
                     self.productionLine.getUnits()[0].getTasks()[0].getBuffer().insertBatch(self.batches.pop(0))
                     heapq.heappush(self.eventqueue, Event(self.currentTime, "load", unit1))
-                    # print("ok"+str(unit1.getTasks()[0].getBuffer().getBufferLoad()))
-                    print(f"loaded batch {self.batches[0].getIdentifier()} to sim")
-                    
+                    print(f"loaded batch to sim at time {self.currentTime}")
                 else:
                     #ENDRE FRA 60 TIL NOE MINDRE SENERE
                     heapq.heappush(self.eventqueue , Event(self.currentTime + 60, "loadBatchesToSimulation", unit1))
+                    print(f"could not load batch to sim at time {self.currentTime}")
+                          
             if currentEvent.action == "load":
-                
-                 
                 for task in currentUnit.getTasks():#Task 1, 3 ,6 ,9 
                     bool, batch = task.canProcessBatch() #sjekker om task kan ta en batch fra bufferen sin
                     if bool: # sjekker buffer før, etter og task
                         time = task.processBatch(batch) #tar en batch fra bufferen sin og kjører den
                         currentUnit.setCurrentlyProcessingTask(task)
                         heapq.heappush(self.eventqueue,Event(self.currentTime + time, "unload", currentUnit)) #lager ny unload event
-                        print(f"loaded batch {batch.getIdentifier()} to {currentUnit.getIdentifier()}")
+                        print(f"loaded batch to {currentUnit.getIdentifier()} at time {self.currentTime}")
                     else:
-                        continue
+                        pass
                            
                  
             if currentEvent.action == "unload":
                 #Sette currentlyProcessing til None igjen
                 nextTaskUnit = self.productionLine.getUnitFromTask(currentUnit.getCurrentlyProcessingTask().getNextTask()) #henter neste task sin unit
-                print(f"unloaded batch {currentUnit.getCurrentlyProcessingTask().getCurrentlyProcessingBatch().getIdentifier()}")
+                """ for task in currentUnit.getTasks():
+                    if task.getBuffer().canInsertBatch(currentUnit.getCurrentlyProcessingTask().getCurrentlyProcessingBatch()):
+                        task.getBuffer().insertBatch(currentUnit.getCurrentlyProcessingTask().getCurrentlyProcessingBatch()) """
+                print(task.getBuffer().getIdentifier())
                 currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(None)
                 currentUnit.setCurrentlyProcessingTask(None)
                 heapq.heappush(self.eventqueue,Event(self.currentTime + 0, "load", currentUnit))
                 heapq.heappush(self.eventqueue,Event(self.currentTime + 60, "load", nextTaskUnit))
-                print(nextTaskUnit.getIdentifier())
-                for event in self.eventqueue:
-                    print(f"event {event.action} at time {event.time} to Unit {event.unit.getIdentifier()}")
-                
-            
-
-# main
+                print(f"unloaded batch from {currentUnit.getIdentifier()} at time {self.currentTime}")
+                print(f"buffer 2: {nextTaskUnit.getTasks()[1].getBuffer().getBatches()}")
+        
+            if(self.currentTime > 1000):
+                print("Simulation finished")
+                return
+# main          
 # ----
 
 def main():
