@@ -22,19 +22,16 @@ import heapq
 
 class Batches:
 
-    def __init__(self, identifier) -> None:
-        self.identifier = identifier
-        self.size = 50#random.randint(20, 50)
+    def __init__(self, id):
+        self.id = id
+        self.size = 50
 
-        self.taskRemaining = list(range(1, 10))
-
-    def getIdentifier(self):
-        return self.identifier
+    def getId(self):
+        return self.id
 
     def getBatchSize(self):
         return self.size
     
-
     def getTasksRemaining(self):
         return self.taskRemaining
 
@@ -53,14 +50,15 @@ class Buffer:
     LOADING_TIME = 60
     UNLOADING_TIME = 60
 
-    def __init__(self, capacity) -> None:
-        # Capacity is 120, unless it is the last one
-        # self.capacity = 120 if not last else sys.maxsize
-        self.capacity = 120 if capacity == None else capacity
-        self.batches = []
-        # Decides if it is the last buffer
-        # self.last = last
+    def __init__(self, id,capacity):
 
+        self.id = id
+        self.capacity = capacity
+        self.batches = []
+
+    def getId(self):
+        return self.id
+    
     def getCapacity(self):
         return self.capacity
 
@@ -91,96 +89,74 @@ class Buffer:
     def popBatch(self):
         return self.batches.pop(0)
 
-    # Kanskje ha en unload funksjon her for å flytte batchen til neste buffer?
-
 
 class Task:
-    TASK_1 = 0.5
-    TASK_2 = 3.5
-    TASK_3 = 1.2
-    TASK_4 = 3
-    TASK_5 = 0.8
-    TASK_6 = 0.5
-    TASK_7 = 1
-    TASK_8 = 1.9
-    TASK_9 = 0.3
+    def __init__(self, id,processTime, loadBuffer,unloadBuffer):
+        self.id = id
+        self.processTime = processTime
+        self.loadBuffer = loadBuffer
+        self.unloadBuffer = unloadBuffer
+        self.currentlyProcessingBatch = None
 
-    def __init__(self, task, taskNr) -> None:
-        self.task = task
-        self.taskNr = taskNr
-        self.processTime = 0
-        self.input_buffer = Buffer(None)
-        self.currentlyProcessing = None
-
-        if taskNr == 9:
-            self.output_buffer = Buffer(sys.maxsize)
-
-    def getTask(self):
+    def getTaskId(self):
         return self.task
-
-    def getTasknr(self):
-        return self.taskNr
-
-    def getBuffer(self):
-        return self.input_buffer
-
-    def getNextTask(self):
-        return self.nextTask
-
+    
     def getProcessTime(self):
         return self.processTime
 
-    def calculateProcessTime(self, batch):
-        self.processTime = (self.task * batch.getBatchSize())
-        return self.processTime
+    def getLoadBuffer(self):
+        return self.loadBuffer
 
-    def getNextBufferCapacity(self, task):
-        return task.getBuffer().getCapacity()
+    def getUnloadBuffer(self):
+        return self.unloadBuffer
+
+    def calculateProcessTime(self, batch):
+        totalTime = (self.getProcessTime() * batch.getBatchSize())
+        return totalTime
+
+    def getUnloadBufferCapacity(self, task):
+        return self.getUnloadBuffer().getCapacity()
     
     def canProcessBatch(self):
-        #print("NextTask ", self.getNextTask().getTasknr(), "TaskNr ", self.getTasknr())
-        nextBufferCap = self.getNextTask().getBuffer().getCapacity() if self.getNextTask() != None else sys.maxsize
-        # print(nextBufferCap, "Chris")
-        if self.getBuffer().getBufferLoad()>0 and self.currentlyProcessing == None:
-            for batch in self.input_buffer.getBatches():
-                if batch.getBatchSize() <= nextBufferCap and batch.getNextTask() == self.getTasknr():
+        unloadBufferCap = self.getUnloadBufferCapacity()
+        if self.getLoadBuffer() and self.currentlyProcessing == None:
+            for batch in self.getLoadBuffer().getBatches():
+                if batch.getBatchSize() <= unloadBufferCap:
                     return True, batch
         return False, None
             
     def processBatch(self, batch):
-        # print(f"Processing Batch {batch.getIdentifier()} in Task {self.taskNr}")
         self.currentlyProcessing = self.input_buffer.removeAndGetBatch(batch)
-        self.currentlyProcessing.removeDoneTask()
         time = self.calculateProcessTime(self.currentlyProcessing)
+
         return time
     
     def getCurrentlyProcessingBatch(self):
-        return self.currentlyProcessing
+        return self.currentlyProcessingBatch
     
     def setCurrentlyProcessingBatch(self, batch):
-        self.currentlyProcessing = batch
+        self.currentlyProcessingBatch = batch
         
-    
 
 
 class Unit:
 
-    def __init__(self, identifier, tasks) -> None:
-        self.identifier = identifier
-        self.tasks = [Task(task[0], task[1]) for task in tasks]
+    def __init__(self, id, tasks):
+        self.id = id
+        self.tasks = tasks
         self.currentlyProcessingTask = None
 
-    def getIdentifier(self):
-        return self.identifier
+    def getId(self):
+        return self.id
 
     def getTasks(self):
         return self.tasks
     
-    def setCurrentlyProcessingTask(self, task):
-        self.currentlyProcessingTask = task
-
     def getCurrentlyProcessingTask(self):
         return self.currentlyProcessingTask
+    
+    def setCurrentlyProcessingTask(self, task):
+        self.currentlyProcessingTask = task
 
 
 class Event:
@@ -195,32 +171,43 @@ class Event:
     def __eq__(self,other):
         return self.time == other.time
 
-    def getTime(self):
+    def getEventTime(self):
         return self.time
     
-    def getUnit(self):
+    def getEventUnit(self):
         return self.unit
 
 
 class ProductionLine:
     def __init__(self) -> None:
 
-        self.units = [Unit("Unit 1", [[Task.TASK_1, 1], [Task.TASK_3, 3], [Task.TASK_6, 6], [Task.TASK_9, 9]]),
-                      Unit("Unit 2", [[Task.TASK_2, 2], [Task.TASK_5, 5], [Task.TASK_7, 7]]),
-                      Unit("Unit 3", [[Task.TASK_4, 4], [Task.TASK_8, 8]])]
-        self.wafersToProduce = 1000
-        self.connect_tasks()
+        buffer1=Buffer(1,120)
+        buffer2=Buffer(2,120)
+        buffer3=Buffer(3,120)
+        buffer4=Buffer(4,120)
+        buffer5=Buffer(5,120)
+        buffer6=Buffer(6,120)
+        buffer7=Buffer(7,120)
+        buffer8=Buffer(8,120)
+        buffer9=Buffer(9,120)
+        buffer10=Buffer(10,999999)
 
-    def connect_tasks(self):
-        all_tasks = []
-        for unit in self.units:
-            all_tasks.extend(unit.getTasks())
+        task1 = Task(1,0.5, buffer1, buffer2)
+        task2 = Task(2,3.5, buffer2, buffer3)
+        task3 = Task(3,1.2, buffer3, buffer4)
+        task4 = Task(4,3, buffer4, buffer5)
+        task5 = Task(5,0.8, buffer5, buffer6)
+        task6 = Task(6,0.5, buffer6, buffer7)
+        task7 = Task(7,1, buffer7, buffer8)
+        task8 = Task(8,1.9, buffer8, buffer9)
+        task9 = Task(9,0.3, buffer9, buffer10)
 
-        all_tasks.sort(key=lambda t: t.getTasknr())
+        unit1 = Unit(1,[task1,task3,task6,task9])
+        unit2 = Unit(2,[task2,task5,task7])
+        unit3 = Unit(3,[task4,task8])
 
-        for i in range(len(all_tasks) - 1):
-            all_tasks[i].nextTask = all_tasks[i + 1]
-        all_tasks[-1].nextTask = None
+        self.units = [unit1, unit2, unit3]
+
 
     def getUnits(self):
         return self.units
@@ -229,19 +216,7 @@ class ProductionLine:
         for unit in self.units:
             if task in unit.getTasks():
                 return unit
-        return None
         
-
-
-class Schedule:
-    def __init__(self, tasks):
-        self.tasks = tasks
-
-
-class Printer:
-    def __init__(self):
-        self.separator = "\t"
-
 
 class Simulation:
 
