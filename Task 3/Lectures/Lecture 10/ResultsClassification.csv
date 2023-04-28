@@ -1,0 +1,4 @@
+	on-time	delayed	failed
+on-time	8	3	3
+delayed	6	5	0
+failed	2	7	6
