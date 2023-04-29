@@ -24,8 +24,8 @@ class Batches:
 
     def __init__(self, id):
         self.id = id
-        self.size = 50
-
+        self.size = 50 #random.randint(20, 50)
+        self.taskRemaining = list(range(1, 10))
     def getId(self):
         return self.id
 
@@ -299,7 +299,7 @@ class Simulation:
             if currentEvent.getEventAction() == "loadBatchesToSimulation":
                 if(len(self.batches) == 0):
                     continue
-                if task1.getLoadBuffer().canInsertBatch(self.batches[0]):
+                elif task1.getLoadBuffer().canInsertBatch(self.batches[0]):
                     task1.getLoadBuffer().insertBatch(self.batches.pop(0))
                     heapq.heappush(self.getEventQueue(), Event(self.getCurrentTime(), "load", unit1))
                     #print(f"loaded batch to sim at time {self.getCurrentTime()}")
