@@ -26,12 +26,13 @@ class Batches:
         self.id = id
         self.size = random.randint(20, 50)
         self.taskRemaining = list(range(1, 10))
+
     def getId(self):
         return self.id
 
     def getBatchSize(self):
         return self.size
-    
+
     def getTasksRemaining(self):
         return self.taskRemaining
 
@@ -50,7 +51,7 @@ class Buffer:
     LOADING_TIME = 60
     UNLOADING_TIME = 60
 
-    def __init__(self, id,capacity):
+    def __init__(self, id, capacity):
 
         self.id = id
         self.capacity = capacity
@@ -58,7 +59,7 @@ class Buffer:
 
     def getId(self):
         return self.id
-    
+
     def getCapacity(self):
         return self.capacity
 
@@ -73,13 +74,12 @@ class Buffer:
 
     def insertBatch(self, batch):
         if self.getBufferLoad() + batch.getBatchSize() > self.capacity:
-            #Her er bufferen for neste full, så derfor må vi legge en ny event for neste task, slik at den evt kan kjøres.
-            print("Denne kan ikke kjøres, Full buffer! med buffersize ",str(self.getBufferLoad()) )
+            # Her er bufferen for neste task full
+            Exception("Buffer is full")
         self.batches.append(batch)
 
     def canInsertBatch(self, batch):
         return (self.getBufferLoad() + batch.getBatchSize()) <= self.capacity
-            
 
     def removeBatch(self, batch):
         self.batches.remove(batch)
@@ -94,7 +94,7 @@ class Buffer:
 # 4. Tasks
 # ---------
 class Task:
-    def __init__(self, id,processTime, loadBuffer,unloadBuffer):
+    def __init__(self, id, processTime, loadBuffer, unloadBuffer):
         self.id = id
         self.processTime = processTime
         self.loadBuffer = loadBuffer
@@ -103,7 +103,7 @@ class Task:
 
     def getId(self):
         return self.id
-    
+
     def getProcessTime(self):
         return self.processTime
 
@@ -112,34 +112,30 @@ class Task:
 
     def getUnloadBuffer(self):
         return self.unloadBuffer
-    
+
     def getCurrentlyProcessingBatch(self):
         return self.currentlyProcessingBatch
-    
+
     def calculateProcessTime(self, batch):
-        totalTime = round(self.getProcessTime() * batch.getBatchSize(),0)
-        print(totalTime)
-        return totalTime
+        return round(self.getProcessTime() * batch.getBatchSize(), 0)
 
     def getUnloadBufferCapacity(self):
         return self.getUnloadBuffer().getBufferLoad()
 
-            
     def processBatch(self, batch):
         self.currentlyProcessingBatch = batch
         self.getLoadBuffer().removeBatch(batch)
-        time = self.calculateProcessTime(self.currentlyProcessingBatch)
-        return time
-    
+        return self.calculateProcessTime(self.currentlyProcessingBatch)
+
     def moveBatch(self, batch):
         self.getUnloadBuffer().getBatches().append(batch)
-    
+
     def getCurrentlyProcessingBatch(self):
         return self.currentlyProcessingBatch
-    
+
     def setCurrentlyProcessingBatch(self, batch):
         self.currentlyProcessingBatch = batch
-    
+
     def getNextTask(self):
         return self.getId() + 1
 
@@ -159,21 +155,22 @@ class Unit:
 
     def getTasks(self):
         return self.tasks
-    
+
     def getCurrentlyProcessingTask(self):
         return self.currentlyProcessingTask
-    
+
     def setCurrentlyProcessingTask(self, task):
         self.currentlyProcessingTask = task
 
     def getAvailableAt(self):
         return self.availableAt
-    
-    def setAvailableAt(self,time):
+
+    def setAvailableAt(self, time):
         self.availableAt == time
 
-    def canProcessBatch(self,task):
-        unloadBufferCap = (task.getUnloadBuffer().getCapacity() - task.getUnloadBufferCapacity() )
+    def canProcessBatch(self, task):
+        unloadBufferCap = (task.getUnloadBuffer(
+        ).getCapacity() - task.getUnloadBufferCapacity())
         if task.getLoadBuffer().getBufferLoad() > 0 and task.getCurrentlyProcessingBatch() == None and self.getCurrentlyProcessingTask() == None:
             for batch in task.getLoadBuffer().getBatches():
                 if batch.getBatchSize() <= unloadBufferCap:
@@ -189,18 +186,18 @@ class Event:
         self.action = action
         self.unit = unit
 
-    def __lt__(self,other):
+    def __lt__(self, other):
         return self.time < other.time
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         return self.time == other.time
 
     def getEventTime(self):
         return self.time
-    
+
     def getEventAction(self):
         return self.action
-    
+
     def getEventUnit(self):
         return self.unit
 
@@ -210,56 +207,56 @@ class Event:
 class ProductionLine:
     def __init__(self) -> None:
 
-        self.buffer1=Buffer(1,120)
-        self.buffer2=Buffer(2,120)
-        self.buffer3=Buffer(3,120)
-        self.buffer4=Buffer(4,120)
-        self.buffer5=Buffer(5,120)
-        self.buffer6=Buffer(6,120)
-        self.buffer7=Buffer(7,120)
-        self.buffer8=Buffer(8,120)
-        self.buffer9=Buffer(9,120)
-        self.buffer10=Buffer(10,999999)
+        self.buffer1 = Buffer(1, 120)
+        self.buffer2 = Buffer(2, 120)
+        self.buffer3 = Buffer(3, 120)
+        self.buffer4 = Buffer(4, 120)
+        self.buffer5 = Buffer(5, 120)
+        self.buffer6 = Buffer(6, 120)
+        self.buffer7 = Buffer(7, 120)
+        self.buffer8 = Buffer(8, 120)
+        self.buffer9 = Buffer(9, 120)
+        self.buffer10 = Buffer(10, 999999)
 
-        self.task1 = Task(1,0.5, self.buffer1, self.buffer2)
-        self.task2 = Task(2,3.5, self.buffer2, self.buffer3)
-        self.task3 = Task(3,1.2, self.buffer3, self.buffer4)
-        self.task4 = Task(4,3, self.buffer4, self.buffer5)
-        self.task5 = Task(5,0.8, self.buffer5, self.buffer6)
-        self.task6 = Task(6,0.5, self.buffer6, self.buffer7)
-        self.task7 = Task(7,1, self.buffer7, self.buffer8)
-        self.task8 = Task(8,1.9, self.buffer8, self.buffer9)
-        self.task9 = Task(9,0.3, self.buffer9, self.buffer10)
+        self.task1 = Task(1, 0.5, self.buffer1, self.buffer2)
+        self.task2 = Task(2, 3.5, self.buffer2, self.buffer3)
+        self.task3 = Task(3, 1.2, self.buffer3, self.buffer4)
+        self.task4 = Task(4, 3, self.buffer4, self.buffer5)
+        self.task5 = Task(5, 0.8, self.buffer5, self.buffer6)
+        self.task6 = Task(6, 0.5, self.buffer6, self.buffer7)
+        self.task7 = Task(7, 1, self.buffer7, self.buffer8)
+        self.task8 = Task(8, 1.9, self.buffer8, self.buffer9)
+        self.task9 = Task(9, 0.3, self.buffer9, self.buffer10)
 
-        self.tasks = [self.task1,self.task2,self.task3,self.task4,self.task5,self.task6,self.task7,self.task8,self.task9]
+        self.tasks = [self.task1, self.task2, self.task3, self.task4,
+                      self.task5, self.task6, self.task7, self.task8, self.task9]
 
-        self.unit1 = Unit(1,[self.task1,self.task3,self.task6,self.task9])
-        self.unit2 = Unit(2,[self.task2,self.task5,self.task7])
-        self.unit3 = Unit(3,[self.task4,self.task8])
+        self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
+        self.unit2 = Unit(2, [self.task2, self.task5, self.task7])
+        self.unit3 = Unit(3, [self.task4, self.task8])
 
         self.units = [self.unit1, self.unit2, self.unit3]
 
-
     def getUnits(self):
         return self.units
-    
+
     def getUnitFromTask(self, task):
         for unit in self.units:
             if task in unit.getTasks():
                 return unit
-    
+
     def getTaskFromId(self, id):
         for unit in self.units:
             for task in unit.getTasks():
                 if task.getId() == id:
                     return task
-    
+
     def getUnitFromTaskId(self, id):
         for unit in self.units:
             for task in unit.getTasks():
                 if task.getTaskId() == id:
                     return unit
-                
+
     def getTasks(self):
         return self.tasks
 
@@ -269,19 +266,20 @@ class ProductionLine:
 class Printer:
     def __init__(self):
         self.separator = "\t"
-  
+
     def getBuffers(self, productionLine):
         for task in productionLine.getTasks():
             print(task.getLoadBuffer().getBatches())
             for batch in task.getLoadBuffer().getBatches():
-                print(f"batch {batch.getId()} in buffer {task.getLoadBuffer().getId()}") 
-        batch_ids = [batch.getId() for batch in productionLine.buffer10.getBatches()]
-        print(f"Ids of batches in last buffer: {batch_ids}")   
+                print(
+                    f"batch {batch.getId()} in buffer {task.getLoadBuffer().getId()}")
+        batch_ids = [batch.getId()
+                     for batch in productionLine.buffer10.getBatches()]
+        print(f"Ids of batches in last buffer: {batch_ids}")
 
-    def getTasks(self,productionLine):
+    def getTasks(self, productionLine,outputFile):
         for task in productionLine.getTasks():
             print(task.getCurrentlyProcessingBatch())
-         
 
     def printEventQueue(self, eventQueue, outputFile):
         outputFile.write("Waiting Events\n")
@@ -291,67 +289,71 @@ class Printer:
     def printEvent(self, event, outputFile):
         outputFile.write(f"Event: {event.getEventAction()} at {event.getEventTime()} on unit {event.getEventUnit().getId()}\n")
 
-    def printSchedule(self, scheduler, outputFile):
-        outputFile.write("Scheduled events\n")
-        for event in scheduler.getEvents():
-            self.printEvent(event, outputFile)
+    def printLoadedToSim(self,batch,event,outputFile):
+        outputFile.write(f"Loaded batch {batch.getId()} to simulation at time {event.getEventTime()}\n")
 
-    def printEvent(self, event, outputFile):
-        outputFile.write("{0:s}".format(event.getEventAction()))
-        outputFile.write(self.separator)
-        outputFile.write("{0:g}".format(event.getEventTime()))
-        outputFile.write(self.separator)
-        outputFile.write("{0:s}".format(event.getEventUnit().getId()))
-        outputFile.write("\n")
-  
-          
+    def printLoad(self,batch,task,event,outputFile):
+        outputFile.write(f"Loaded batch {batch.getId()} to task {task.getId()} at time {event.getEventTime()}\n")
+
+    def printUnload(self,batch,task,event,outputFile):
+        outputFile.write(f"Unloaded batch {batch.getId()} from task {task.getId()} at time {event.getEventTime()}\n")
+
 
 
 # 9. Simulation
 # -------------
 class Simulation:
 
-    def __init__(self) -> None:
+    def __init__(self, wafersToProduce) -> None:
         self.eventqueue = []
         self.batches = []
         self.currentTime = 0
         self.productionLine = ProductionLine()
         self.units = self.productionLine.getUnits()
         self.printer = Printer()
-    
+        self.wafersToProduce = wafersToProduce
+
     def getEventQueue(self):
         return self.eventqueue
-    
+
     def getBatches(self):
         return self.batches
-    
+
     def getCurrentTime(self):
         return self.currentTime
 
     def getProductionLine(self):
         return self.productionLine
-    
+
     def getUnits(self):
         return self.units
-    
+
     def getFirst(self):
         return self.eventqueue[0]
-    
+
     def setCurrentTime(self, time):
         self.currentTime = time
+    
+    def addBatches(self, batch):
+        self.batches.append(batch)
         
-    def printAllBuffers(self):
-        print("Denne skal kjøres")
-        self.printer.getBuffers(self.productionLine)
-
+    def getBatches(self):
+        return self.batches
+    
+    def addEvent(self, event):
+        heapq.heappush(self.getEventQueue(),event)
+        
     def createBatches(self):
-        wafersToProduce = 1000
         index = 0
-        while wafersToProduce > 0:
+        timebetween = 0
+        
+        while self.wafersToProduce > 0:
             batch = Batches(index)
-            wafersToProduce -= batch.getBatchSize()
-            self.batches.append(batch)
-            heapq.heappush(self.eventqueue, Event(0, "loadBatchesToSimulation", self.productionLine.getUnits()[0]))
+            self.wafersToProduce -= batch.getBatchSize()
+            self.addBatches(batch)
+            heapq.heappush(self.eventqueue, Event(
+                timebetween, "loadBatchesToSimulation", self.productionLine.getUnits()[0]))
+            timebetween += 0
             index += 1
 
     def runSimulation(self):
@@ -359,122 +361,118 @@ class Simulation:
         unit2 = self.productionLine.getUnits()[1]
         unit3 = self.productionLine.getUnits()[2]
         task1 = unit1.getTasks()[0]
+        
+        outputfile = open("example.txt", "w")
+        #outputfile = sys.stdout
+        
         self.createBatches()
 
-        teller = 0
         while self.getEventQueue():
-            teller+=1
-            print(teller)
-            liste = []
-            for event in self.getEventQueue():
-                liste.append(str(str(event.getEventAction())+" to unit "+ str(event.getEventUnit().getId()) + " at time " + str(event.getEventTime()))) if event.getEventUnit() != None else liste.append(str(str(event.getEventAction())+" at time " + str(event.getEventTime())))
-            print(liste)   
             self.setCurrentTime(self.getFirst().getEventTime())
             currentEvent = heapq.heappop(self.eventqueue)
-           
-                
+
             currentUnit = currentEvent.getEventUnit()
             if currentUnit == None:
                 continue
-            #load batches to simulation
-            #--------------------------
+            # load batches to simulation
+            # --------------------------
             if currentEvent.getEventAction() == "loadBatchesToSimulation":
-                if(len(self.batches) == 0):
+                if (len(self.batches) == 0):
                     continue
                 elif task1.getLoadBuffer().canInsertBatch(self.batches[0]):
-                    task1.getLoadBuffer().insertBatch(self.batches.pop(0))
-                    heapq.heappush(self.getEventQueue(), Event(self.getCurrentTime(), "load", unit1))
-
-                    #print(f"loaded batch to sim at time {self.getCurrentTime()}")
-                    #print(f"batches left to load: {len(self.batches)}-------------------------------------------")
+                    batch = self.batches.pop(0)
+                    task1.getLoadBuffer().insertBatch(batch)
+                    heapq.heappush(self.getEventQueue(), Event(
+                        self.getCurrentTime(), "load", unit1))
+                    self.printer.printLoadedToSim(batch,currentEvent,outputfile)
                 else:
-                    heapq.heappush(self.getEventQueue() , Event(self.getCurrentTime() + 60, "loadBatchesToSimulation", unit1))
+                    heapq.heappush(self.getEventQueue(), Event(
+                    self.getCurrentTime(), "loadBatchesToSimulation", unit1))
 
-            #load batches to a task
-            # --------------------------              
+
+            # load batches to a task
+            # --------------------------
             elif currentEvent.action == "load":
-                #Kanskje jeg må sjekke om det er noen load før unload?
-                
-                
                 for task in currentUnit.getTasks():
-                    bool, batch = currentUnit.canProcessBatch(task) 
+                    bool, batch = currentUnit.canProcessBatch(task)
                     if bool:
-                        print("Task : "+ str(task.getId())+ "------------------")
-                        time = task.processBatch(batch) + 60 
+                        # if task == task1 and task1.getLoadBuffer().canInsertBatch(self.batches[0]):
+                        #     heapq.heappush(self.getEventQueue(), Event(
+                        #     self.getCurrentTime(), "loadBatchesToSimulation", unit1))
+                        time = task.processBatch(batch) + 60
                         currentUnit.setCurrentlyProcessingTask(task)
                         currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(batch)
-                        currentUnit.setAvailableAt(self.getCurrentTime() + time)
-                        heapq.heappush(self.getEventQueue(),Event(self.getCurrentTime() + time, "unload", currentUnit))
-                        print(teller, "------------------")
-                        
-                        print(f"loaded batch {batch.getId()} to Task {task.getId()} at time {self.getCurrentTime()}")
+                        currentUnit.setAvailableAt(
+                            self.getCurrentTime() + time)
+                        heapq.heappush(self.getEventQueue(), Event(
+                            self.getCurrentTime() + time, "unload", currentUnit))
+                        self.printer.printLoad(batch,task,currentEvent,outputfile)
                         continue
-                if bool != True:
-                    #Ikke finner noe den kan gjøre
-                    print("IKKE HAVN HER!")
-                    
-                    # print(liste)
-                           
 
-            #unload batches from a task
-            # --------------------------  
-            
+            # unload batches from a task
+            # --------------------------
+
             elif currentEvent.action == "unload":
-                print("Det er her vi skal unloade!\n\n")
-                print(liste)  
                 currentTask = currentUnit.getCurrentlyProcessingTask()
-                
+
                 if currentTask == None:
                     continue
 
-                nextTask = self.productionLine.getTaskFromId(currentTask.getNextTask())
+                nextTask = self.productionLine.getTaskFromId(
+                    currentTask.getNextTask())
 
                 batch = currentTask.getCurrentlyProcessingBatch()
-                
-                
-                currentTask.getUnloadBuffer().insertBatch(batch)        
+                currentTask.getUnloadBuffer().insertBatch(batch)
                 currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(None)
                 currentUnit.setCurrentlyProcessingTask(None)
-                heapq.heappush(self.eventqueue,Event(self.currentTime + 0, "load", currentUnit))
-                #Siste Task på unit 1
+                heapq.heappush(self.eventqueue, Event(
+                    self.currentTime + 0, "load", currentUnit))
+                self.printer.printUnload(batch,currentTask,currentEvent,outputfile)
+                # Siste Task på unit 1
                 if self.productionLine.getUnitFromTask(nextTask) == None:
-                    heapq.heappush(self.eventqueue,Event(self.currentTime + 60, "load", unit2))
-                    heapq.heappush(self.eventqueue,Event(self.currentTime + 60, "load", unit3))
+                    if len(self.getEventQueue())==0:
+                        continue
+                    heapq.heappush(self.eventqueue, Event(
+                        self.currentTime + 60, "load", unit2))
+                    heapq.heappush(self.eventqueue, Event(
+                        self.currentTime + 60, "load", unit3))
                 else:
-                    heapq.heappush(self.eventqueue,Event(self.currentTime + 60, "load", self.productionLine.getUnitFromTask(nextTask)))
-                print(f"unloaded batch {batch.getId()} from Task {currentTask.getId()} at time {self.currentTime}")
-            
-            
-
-        
-            if(self.currentTime > 30000):
-                print("Simulation finished")
-                return
-        for batch in self.productionLine.getUnits()[0].getTasks()[3].getUnloadBuffer().getBatches():
-            print(batch.getId())
-            
-        for unit in self.productionLine.getUnits():
-            print(unit.getCurrentlyProcessingTask())
-            print("Dette")
-        
-        
-
-        
+                    heapq.heappush(self.eventqueue, Event(
+                        self.currentTime + 60, "load", self.productionLine.getUnitFromTask(nextTask)))
+                    
+        self.printer.getBuffers(self.productionLine)
+        print("Simulation finished", self.currentTime)
 
 
-
-
-# 10. Main
-# --------       
-def main():
-    sim = Simulation()
-    sim.runSimulation()
-    sim.printAllBuffers()
-
-    # sim.printAllBuffers()
-
+# 10. Optimization
+def worstCase():
+    #Manual to send in one batch at a time
+    wafersToProduce = 1000
+    index = 0
+    totalTime = 0
+    #Creating one batch then run the simulation
+    while wafersToProduce > 0:
+        batch = Batches(index)
+        simulation = Simulation(batch.getBatchSize())
+        wafersToProduce -= batch.getBatchSize()
+        index += 1
+        simulation.runSimulation()
+        totalTime += simulation.getCurrentTime()
+    print("Worst case: ", totalTime)
 
     
+    
+    
+
+# 10. Main
+# --------
+def main():
+    sim = Simulation(1000)
+    sim.runSimulation()
+    #worstCase()
+
+
+    # sim.printAllBuffers()
 
 
 main()

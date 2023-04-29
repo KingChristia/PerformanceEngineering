@@ -1,0 +1,19 @@
+Loaded batch 0 to simulation at time 0
+Loaded batch 0 to task 1 at time 0
+Unloaded batch 0 from task 1 at time 84.0
+Loaded batch 0 to task 2 at time 144.0
+Unloaded batch 0 from task 2 at time 372.0
+Loaded batch 0 to task 3 at time 432.0
+Unloaded batch 0 from task 3 at time 550.0
+Loaded batch 0 to task 4 at time 610.0
+Unloaded batch 0 from task 4 at time 814.0
+Loaded batch 0 to task 5 at time 874.0
+Unloaded batch 0 from task 5 at time 972.0
+Loaded batch 0 to task 6 at time 1032.0
+Unloaded batch 0 from task 6 at time 1116.0
+Loaded batch 0 to task 7 at time 1176.0
+Unloaded batch 0 from task 7 at time 1284.0
+Loaded batch 0 to task 8 at time 1344.0
+Unloaded batch 0 from task 8 at time 1495.0
+Loaded batch 0 to task 9 at time 1555.0
+Unloaded batch 0 from task 9 at time 1629.0
