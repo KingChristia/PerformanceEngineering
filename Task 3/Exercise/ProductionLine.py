@@ -73,7 +73,6 @@ class Buffer:
 
     def insertBatch(self, batch):
         if self.getBufferLoad() + batch.getBatchSize() > self.capacity:
-            print("Not enough space in buffer")
             return
         self.batches.append(batch)
 
@@ -191,34 +190,34 @@ class Event:
 class ProductionLine:
     def __init__(self) -> None:
 
-        buffer1=Buffer(1,120)
-        buffer2=Buffer(2,120)
-        buffer3=Buffer(3,120)
-        buffer4=Buffer(4,120)
-        buffer5=Buffer(5,120)
-        buffer6=Buffer(6,120)
-        buffer7=Buffer(7,120)
-        buffer8=Buffer(8,120)
-        buffer9=Buffer(9,120)
-        buffer10=Buffer(10,999999)
+        self.buffer1=Buffer(1,120)
+        self.buffer2=Buffer(2,120)
+        self.buffer3=Buffer(3,120)
+        self.buffer4=Buffer(4,120)
+        self.buffer5=Buffer(5,120)
+        self.buffer6=Buffer(6,120)
+        self.buffer7=Buffer(7,120)
+        self.buffer8=Buffer(8,120)
+        self.buffer9=Buffer(9,120)
+        self.buffer10=Buffer(10,999999)
 
-        task1 = Task(1,0.5, buffer1, buffer2)
-        task2 = Task(2,3.5, buffer2, buffer3)
-        task3 = Task(3,1.2, buffer3, buffer4)
-        task4 = Task(4,3, buffer4, buffer5)
-        task5 = Task(5,0.8, buffer5, buffer6)
-        task6 = Task(6,0.5, buffer6, buffer7)
-        task7 = Task(7,1, buffer7, buffer8)
-        task8 = Task(8,1.9, buffer8, buffer9)
-        task9 = Task(9,0.3, buffer9, buffer10)
+        self.task1 = Task(1,0.5, self.buffer1, self.buffer2)
+        self.task2 = Task(2,3.5, self.buffer2, self.buffer3)
+        self.task3 = Task(3,1.2, self.buffer3, self.buffer4)
+        self.task4 = Task(4,3, self.buffer4, self.buffer5)
+        self.task5 = Task(5,0.8, self.buffer5, self.buffer6)
+        self.task6 = Task(6,0.5, self.buffer6, self.buffer7)
+        self.task7 = Task(7,1, self.buffer7, self.buffer8)
+        self.task8 = Task(8,1.9, self.buffer8, self.buffer9)
+        self.task9 = Task(9,0.3, self.buffer9, self.buffer10)
 
-        tasks = [task1,task2,task3,task4,task5,task6,task7,task8,task9]
+        self.tasks = [self.task1,self.task2,self.task3,self.task4,self.task5,self.task6,self.task7,self.task8,self.task9]
 
-        unit1 = Unit(1,[task1,task3,task6,task9])
-        unit2 = Unit(2,[task2,task5,task7])
-        unit3 = Unit(3,[task4,task8])
+        self.unit1 = Unit(1,[self.task1,self.task3,self.task6,self.task9])
+        self.unit2 = Unit(2,[self.task2,self.task5,self.task7])
+        self.unit3 = Unit(3,[self.task4,self.task8])
 
-        self.units = [unit1, unit2, unit3]
+        self.units = [self.unit1, self.unit2, self.unit3]
 
 
     def getUnits(self):
@@ -286,8 +285,7 @@ class Simulation:
         unit1 = self.productionLine.getUnits()[0]
         task1 = unit1.getTasks()[0]
         self.createBatches()
-        for event in self.eventqueue:
-            print(f"Event: {event.getEventAction()} at time {event.getEventTime()}")
+
 
         while self.getEventQueue():
             self.setCurrentTime(self.getFirst().getEventTime())
@@ -304,8 +302,8 @@ class Simulation:
                 if task1.getLoadBuffer().canInsertBatch(self.batches[0]):
                     task1.getLoadBuffer().insertBatch(self.batches.pop(0))
                     heapq.heappush(self.getEventQueue(), Event(self.getCurrentTime(), "load", unit1))
-                    print(f"loaded batch to sim at time {self.getCurrentTime()}")
-                    print(f"batches left to load: {len(self.batches)}-------------------------------------------")
+                    #print(f"loaded batch to sim at time {self.getCurrentTime()}")
+                    #print(f"batches left to load: {len(self.batches)}-------------------------------------------")
                 else:
                     heapq.heappush(self.getEventQueue() , Event(self.getCurrentTime() + 60, "loadBatchesToSimulation", unit1))
 
@@ -319,10 +317,10 @@ class Simulation:
                         currentUnit.setCurrentlyProcessingTask(task)
                         currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(batch)
                         heapq.heappush(self.getEventQueue(),Event(self.getCurrentTime() + time, "unload", currentUnit))
-                        print(f"loaded batch {batch.getId()} to Task {task.getId()} at time {self.getCurrentTime()}")
-                        print(f"task {task.getId()} currently processing batch: {task.getCurrentlyProcessingBatch().getId()}")
+                        if batch.getId() == 0:
+                            print(f"loaded batch {batch.getId()} to Task {task.getId()} at time {self.getCurrentTime()}")
                     else:
-                        print(f"could not load batch to Task {task.getId()}")
+                        #print(f"could not load batch to Task {task.getId()}")
                         pass
                            
 
@@ -340,11 +338,14 @@ class Simulation:
                 currentUnit.setCurrentlyProcessingTask(None)
                 heapq.heappush(self.eventqueue,Event(self.currentTime + 0, "load", currentUnit))
                 heapq.heappush(self.eventqueue,Event(self.currentTime + 60, "load", nextTaskUnit))
-                print(f"unloaded batch {batch.getId()} from Task {currentTask.getId()} at time {self.currentTime}")
+                if batch.getId() == 0:
+                    print(f"unloaded batch {batch.getId()} from Task {currentTask.getId()} at time {self.currentTime}")
         
-            if(self.currentTime > 3000):
+            if(self.currentTime > 5000):
                 print("Simulation finished")
                 return
+        batch_ids = [batch.getId() for batch in self.productionLine.buffer10.getBatches()]
+        print(f"Ids of batches in last buffer: {batch_ids}")
 # main          
 # ----
 
