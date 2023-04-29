@@ -89,6 +89,9 @@ class Buffer:
         return self.batches.pop(0)
 
 
+
+# 4. Tasks
+# ---------
 class Task:
     def __init__(self, id,processTime, loadBuffer,unloadBuffer):
         self.id = id
@@ -135,8 +138,8 @@ class Task:
         return self.getId() + 1
 
 
-
-
+# 5. Units
+# ---------
 class Unit:
 
     def __init__(self, id, tasks):
@@ -165,6 +168,8 @@ class Unit:
         return False, None
 
 
+# 6. Events
+# ---------
 class Event:
     def __init__(self, time, action, unit) -> None:
         self.time = time
@@ -187,6 +192,8 @@ class Event:
         return self.unit
 
 
+# 7. Production Line
+# -------------------
 class ProductionLine:
     def __init__(self) -> None:
 
@@ -239,8 +246,45 @@ class ProductionLine:
             for task in unit.getTasks():
                 if task.getTaskId() == id:
                     return unit
-        
 
+
+# 8. Printer
+# ----------
+class Printer:
+	def __init__(self):
+		self.separator = "\t"
+
+	def printEventQueue(self, eventQueue, outputFile):
+		outputFile.write("Waiting Events\n")
+		for event in eventQueue.getEventQueue():
+			self.printCustomer(customer, outputFile)
+		outputFile.write("Served customer\n");
+		customer = queue.getCurrentlyServedCustomer()
+		if customer==None:
+			outputFile.write("None\n")
+		else:
+			self.printCustomer(event, outputFile)
+
+	def printEvent(self, event, outputFile):
+		outputFile.write(f"Event: {event.getEventAction()} at {event.getEventTime()} on unit {event.getEventUnit().getId()}\n")
+
+	def printSchedule(self, scheduler, outputFile):
+		outputFile.write("Scheduled events\n")
+		for event in scheduler.getEvents():
+			self.printEvent(event, outputFile)
+
+	def printEvent(self, event, outputFile):
+		outputFile.write("{0:s}".format(event.serializeType()))
+		outputFile.write(self.separator)
+		outputFile.write("{0:g}".format(event.getTime()))
+		outputFile.write(self.separator)
+		outputFile.write("{0:s}".format(event.getCustomer().getIdentifier()))
+		outputFile.write("\n")      
+                
+
+
+# 9. Simulation
+# -------------
 class Simulation:
 
     def __init__(self) -> None:
@@ -346,9 +390,12 @@ class Simulation:
                 return
         batch_ids = [batch.getId() for batch in self.productionLine.buffer10.getBatches()]
         print(f"Ids of batches in last buffer: {batch_ids}")
-# main          
-# ----
 
+
+
+
+# 10. Main
+# --------       
 def main():
     sim = Simulation()
     sim.runSimulation()
