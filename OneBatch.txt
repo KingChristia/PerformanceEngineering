@@ -1,0 +1,22 @@
+
+Here is a simulation of 1 Batches running`
+
+Loaded batch 1 to simulation at time 0
+Loaded batch 1 to task 1 at time 0
+Unloaded batch 1 from task 1 at time 26.0
+Loaded batch 1 to task 2 at time 27.0
+Unloaded batch 1 from task 2 at time 203.0
+Loaded batch 1 to task 3 at time 204.0
+Unloaded batch 1 from task 3 at time 265.0
+Loaded batch 1 to task 4 at time 266.0
+Unloaded batch 1 from task 4 at time 417.0
+Loaded batch 1 to task 5 at time 418.0
+Unloaded batch 1 from task 5 at time 459.0
+Loaded batch 1 to task 6 at time 460.0
+Unloaded batch 1 from task 6 at time 486.0
+Loaded batch 1 to task 7 at time 487.0
+Unloaded batch 1 from task 7 at time 538.0
+Loaded batch 1 to task 8 at time 539.0
+Unloaded batch 1 from task 8 at time 635.0
+Loaded batch 1 to task 9 at time 636.0
+Unloaded batch 1 from task 9 at time 652.0
