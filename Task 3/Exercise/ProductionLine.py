@@ -359,39 +359,47 @@ class Printer:
                          for batch in productionLine.buffer10.getBatches()]
             print(f"Ids of batches in last buffer: {batch_ids}")
 
-    def getTasks(self, productionLine, outputFile):
+    def getTasks(self, productionLine, outputLocation):
         if self.outputLocation != None:
             for task in productionLine.getTasks():
                 print(task.getCurrentlyProcessingBatch())
 
-    def printEventQueue(self, eventQueue, outputFile):
+    def printEventQueue(self, eventQueue, outputLocation):
         if self.outputLocation != None:
-            outputFile.write("Waiting Events\n")
+            outputLocation.write("Waiting Events\n")
             for event in eventQueue.getEventQueue():
-                self.printEvent(event, outputFile)
+                self.printEvent(event, outputLocation)
 
-    def printEvent(self, event, outputFile):
+    def printTasks(self,productionline,outputLocation):
+        for task in productionline.getTasks():
+            outputLocation.write(f"Task {task.getId()} with loadingbuffer {task.getLoadingBuffer()} and unloadingbuffer {task.getUnloadingBuffer()}\n")
+
+    def printUnits(self,productionline,outputLocation):
+        for unit in productionline.getUnits():
+            outputLocation.write(f"Unit {unit.getId()} with tasks: {unit.getTasks()}\n")
+
+    def printEvent(self, event, outputLocation):
         if self.outputLocation != None:
-            outputFile.write(
+            outputLocation.write(
                 f"Event: {event.getEventAction()} at {event.getEventTime()} on unit {event.getEventUnit().getId()}\n")
 
-    def printIntroduction(self, simulation, outputFile):
+    def printIntroduction(self, simulation, outputLocation):
         if self.outputLocation != None:
-            outputFile.write(
+            outputLocation.write(
                 f"\nHere is a simulation of {len(simulation.getBatches())} Batches running`\n")
             average = simulation.getAverageBatchSize()
-            outputFile.write(
+            outputLocation.write(
                 f"The batches are produced randomly and have an average size of {round(average,1)}\n")
-            outputFile.write(f"The total runTime is found at the bottom\n\n")
+            outputLocation.write(f"The total runTime is found at the bottom\n\n")
 
-    def printLoadedToSim(self, batch, event, outputFile):
+    def printLoadedToSim(self, batch, event, outputLocation):
         if self.outputLocation != None:
-            outputFile.write(
+            outputLocation.write(
                 f"Loaded batch {batch.getId()} with size {batch.getBatchSize()} to simulation at time {event.getEventTime()}\n")
 
-    def printLoad(self, batch, task, event, outputFile):
+    def printLoad(self, batch, task, event, outputLocation):
         if self.outputLocation != None:
-            outputFile.write(
+            outputLocation.write(
                 f"Loaded batch {batch.getId()} to task {task.getId()} at time {event.getEventTime()}\n")
 
     def printUnload(self, batch, task, event, outputFile):
@@ -487,7 +495,7 @@ class Simulation:
             self.wafersToProduce -= batch.getBatchSize()
             self.addBatches(batch)
             heapq.heappush(self.eventqueue, Event(
-                self.timebetween, "loadBatchesToSimulation", self.productionLine.getUnits()[0]))
+                self.timebetween, "loadBatchToSimulation", self.productionLine.getUnits()[0]))
             self.timebetween += self.interval
             index += 1
 
@@ -508,7 +516,7 @@ class Simulation:
                 continue
             # load batches to simulation
             # --------------------------
-            if currentEvent.getEventAction() == "loadBatchesToSimulation":
+            if currentEvent.getEventAction() == "loadBatchToSimulation":
                 if (len(self.batches) == 0):
                     continue
                 elif task1.getLoadBuffer().canInsertBatch(self.batches[0]):
@@ -520,7 +528,7 @@ class Simulation:
                         batch, currentEvent, self.printer.outputLocation)
                 else:
                     heapq.heappush(self.getEventQueue(), Event(
-                        self.getCurrentTime()+1, "loadBatchesToSimulation", unit1))
+                        self.getCurrentTime()+1, "loadBatchToSimulation", unit1))
 
             # load batches to a task
             # --------------------------
@@ -673,16 +681,23 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 
 def changeOrderingHeuristicAndLoadingtimes():
-    numberOfSimulations = 300  # This number changes time between batches
+    numberOfSimulations = 109  # This number changes time between batches
     results = []
     sim1 = [[], [], []]  # time and time between batches and permutation
     sim2 = [[], [], []]  # time and time between batches and permutation
     sim3 = [[], [], []]  # time, time between batches and permutation
     simulationForPermutaions = Simulation(1)
+    best_results_sim1 = []
+    best_results_sim2 = []
+    best_results_sim3 = []
     task_permutations = simulationForPermutaions.getProductionLine(
     ).generate_task_permutations()
 
-    while numberOfSimulations > 0:
+    while numberOfSimulations > 108:
+        best_result_sim1 = None
+        best_result_sim2 = None
+        best_result_sim3 = None
+        
         simulation1 = Simulation(1000)
         simulation2 = Simulation(1000)
         simulation3 = Simulation(1000)
@@ -739,18 +754,53 @@ def changeOrderingHeuristicAndLoadingtimes():
             sim3[0].append(simulation3.getCurrentTime())
             sim3[1].append(numberOfSimulations)
             sim3[2].append(permutation)
+            
+            if best_result_sim1 is None or simulation1.getCurrentTime() < best_result_sim1[0]:
+                best_result_sim1 = (simulation1.getCurrentTime(), numberOfSimulations, permutation)
+
+            # Update best_result_sim2 if the current result is better
+            if best_result_sim2 is None or simulation2.getCurrentTime() < best_result_sim2[0]:
+                best_result_sim2 = (simulation2.getCurrentTime(), numberOfSimulations, permutation)
+
+            # Update best_result_sim3 if the current result is better
+            if best_result_sim3 is None or simulation3.getCurrentTime() < best_result_sim3[0]:
+                best_result_sim3 = (simulation3.getCurrentTime(), numberOfSimulations, permutation)
+
 
         #Find shortest time, and save the permutation, time and loading time between batches
         best_sim1 = find_shortest_time(sim1)
         best_sim2 = find_shortest_time(sim2)
         best_sim3 = find_shortest_time(sim3)
         results.append([best_sim1, best_sim2, best_sim3])
+        
+        best_results_sim1.append(best_result_sim1)
+        best_results_sim2.append(best_result_sim2)
+        best_results_sim3.append(best_result_sim3)
+
 
         # print("Best results for each simulation:")
         # print(f"Simulation 1: Time: {best_sim1[0]}, Loading time: {best_sim1[1]}, Permutation: {best_sim1[2]}\n")
         # print(f"Simulation 2: Time: {best_sim2[0]}, Loading time: {best_sim2[1]}, Permutation: {best_sim2[2]}\n")
         # print(f"Simulation 3: Time: {best_sim3[0]}, Loading time: {best_sim3[1]}, Permutation: {best_sim3[2]}\n")
         numberOfSimulations -= 1
+    for i, (best_sim1, best_sim2, best_sim3) in enumerate(zip(best_results_sim1, best_results_sim2, best_results_sim3)):
+        print(f"Run {i + 1}:")
+        
+        perm1 = ', '.join([f"{unit.getId()}" for unit in best_sim1[2][0]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim1[2][1]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim1[2][2]])
+        print(f"  Best result for Simulation 1: Time: {best_sim1[0]}, Loading time: {best_sim1[1]}, Permutation: {perm1}")
+
+        perm2 = ', '.join([f"{unit.getId()}" for unit in best_sim2[2][0]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim2[2][1]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim2[2][2]])
+        print(f"  Best result for Simulation 2: Time: {best_sim2[0]}, Loading time: {best_sim2[1]}, Permutation: {perm2}")
+
+        perm3 = ', '.join([f"{unit.getId()}" for unit in best_sim3[2][0]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim3[2][1]]) + " | " + \
+                ', '.join([f"{unit.getId()}" for unit in best_sim3[2][2]])
+        print(f"  Best result for Simulation 3: Time: {best_sim3[0]}, Loading time: {best_sim3[1]}, Permutation: {perm3}\n")
+    print((best_result_sim1))
     times = []
     for run in results:
         for sim in run:
@@ -764,16 +814,17 @@ def changeOrderingHeuristicAndLoadingtimes():
     minTimeSim2 = min(sim2times)
     minTimeSim3 = min(sim3times)
     
-    indexForMinTime1 = sim1times.index(minTimeSim1)
-    indexForMinTime2 = sim2times.index(minTimeSim2)
-    indexForMinTime3 = sim3times.index(minTimeSim3)
+    indexForMinTime1 = times.index(minTimeSim1)
+    indexForMinTime2 = times.index(minTimeSim2)
+    indexForMinTime3 = times.index(minTimeSim3)
+
     
-    print(f"Best simulation 1: Time: {minTimeSim1}, Loading time: {results[0][indexForMinTime1][1]}, Permutation: {results[0][indexForMinTime1][2]}\n")    
-    print(f"Best simulation 2: Time: {minTimeSim2}, Loading time: {results[1][indexForMinTime2][1]}, Permutation: {results[1][indexForMinTime2][2]}\n")
-    print(f"Best simulation 3: Time: {minTimeSim3}, Loading time: {results[2][indexForMinTime3][1]}, Permutation: {results[2][indexForMinTime3][2]}\n")
+    # print(f"Best simulation 1: Time: {minTimeSim1}, Loading time: {results[0][indexForMinTime1][1]}, Permutation: {results[0][indexForMinTime1][2]}\n")    
+    # print(f"Best simulation 2: Time: {minTimeSim2}, Loading time: {results[1][indexForMinTime2][1]}, Permutation: {results[1][indexForMinTime2][2]}\n")
+    # print(f"Best simulation 3: Time: {minTimeSim3}, Loading time: {results[2][indexForMinTime3][1]}, Permutation: {results[2][indexForMinTime3][2]}\n")
     
     
-    print(results)
+    # print(results)
     
     
     
