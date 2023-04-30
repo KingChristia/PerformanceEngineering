@@ -16,6 +16,7 @@ import random
 import sys
 import heapq
 import DocumentWriter
+import matplotlib.pyplot as plt
 
 # 2. Batches
 # -----------
@@ -264,6 +265,9 @@ class ProductionLine:
 
     def getTasks(self):
         return self.tasks
+    
+    #Calculate average batchsize 
+    
 
 
 # 8. Printer
@@ -312,10 +316,7 @@ class Printer:
     def printIntroduction(self,simulation,outputFile):
         if self.outputfile != None:
             outputFile.write(f"\nHere is a simulation of {len(simulation.getBatches())} Batches running`\n")
-            wafers = 0
-            for batch in simulation.getBatches():
-                wafers += batch.getBatchSize()
-            average = wafers / len(simulation.getBatches())
+            average = simulation.getAverageBatchSize()
             outputFile.write(f"The batches are produced randomly and have an average size of {round(average,1)}\n")
             outputFile.write(f"The total runTime is found at the bottom\n\n")
         
@@ -333,8 +334,8 @@ class Printer:
             outputFile.write(f"Unloaded batch {batch.getId()} from task {task.getId()} at time {event.getEventTime()}\n")
 
     def printTotal(self,simulation,outputFile):
-        if self.outputFile != None:
-            outputFile.write(f"\n\nTotal runtime was ")
+        if self.outputfile != None:
+            outputFile.write(f"\n\nTotal runtime was {simulation.getCurrentTime()}")
 
 
 
@@ -357,6 +358,13 @@ class Simulation:
 
     def getEventQueue(self):
         return self.eventqueue
+    
+    #Calculate average batch size
+    def getAverageBatchSize(self):
+        tot = 0
+        for batch in self.batches:
+            tot += batch.getBatchSize()
+        return tot / len(self.batches)
     
     def getBatchSize(self):
         return self.batchSize
@@ -424,7 +432,7 @@ class Simulation:
         unit3 = self.productionLine.getUnits()[2]
         task1 = unit1.getTasks()[0]
         
-        self.createBatches()
+        
         self.printer.printIntroduction(self,self.printer.outputfile)
 
         while self.getEventQueue():
@@ -497,7 +505,7 @@ class Simulation:
                     heapq.heappush(self.eventqueue, Event(
                         self.currentTime + 1, "load", self.productionLine.getUnitFromTask(nextTask)))
                     
-        #self.printer.getBuffers(self.productionLine)
+        self.printer.printTotal(self,self.printer.outputfile)
         print("Simulation finished", self.currentTime)
 
 
@@ -513,16 +521,16 @@ def worstCase():
         simulation = Simulation(batch.getBatchSize())
         wafersToProduce -= batch.getBatchSize()
         index += 1
+        simulation.createBatches()
         simulation.runSimulation()
         totalTime += simulation.getCurrentTime()
     return totalTime
 
 def reducingTimeBetweenBatches():
-    numberOfSimulations = 200 #This number changes time between batches
-    sim1 = []
-    sim2 = []
-    sim3 = []
-    
+    numberOfSimulations = 1000 #This number changes time between batches
+    sim1 = [[],[]] #time and time between batches
+    sim2 = [[],[]]  #time and time between batches
+    sim3 = [[],[],[]] #time, time between batches and average batchsize
     while numberOfSimulations > 0:
         
         #Simulation 1 with batchsize 20
@@ -531,8 +539,10 @@ def reducingTimeBetweenBatches():
         simulation1.getPrinter().removeOutput() #Removes the print that runs every simulation
         simulation1.setInterval(numberOfSimulations) #Increase time between loading with a constant number
         simulation1.setTimeBetweenBatches(0) #Change the loading time between batches to be the same number as simulations
+        simulation1.createBatches()
         simulation1.runSimulation()
-        sim1.append(simulation1.getCurrentTime())
+        sim1[0].append(simulation1.getCurrentTime())
+        sim1[1].append(numberOfSimulations)
         
         #Simulation 2 with batchsize 50
         simulation2 = Simulation(1000)
@@ -540,24 +550,39 @@ def reducingTimeBetweenBatches():
         simulation2.getPrinter().removeOutput() #Removes the print that runs every simulation
         simulation2.setInterval(numberOfSimulations) #Increase time between loading with a constant number
         simulation2.setTimeBetweenBatches(0) #Change the loading time between batches to be the same number as simulations
+        simulation2.createBatches()
         simulation2.runSimulation()
-        sim2.append(simulation2.getCurrentTime())
+        sim2[0].append(simulation2.getCurrentTime())
+        sim2[1].append(numberOfSimulations)
         
         simulation3 = Simulation(1000)
         simulation3.setBatchSize(None)
         simulation3.getPrinter().removeOutput() #Removes the print that runs every simulation
         simulation3.setInterval(numberOfSimulations) #Increase time between loading with a constant number
         simulation3.setTimeBetweenBatches(0) #Change the loading time between batches to be the same number as simulations
+        simulation3.createBatches()
+        sim3[2].append(simulation3.getAverageBatchSize())
+        print(simulation3.getAverageBatchSize())
         simulation3.runSimulation()
-        sim3.append(simulation3.getCurrentTime())
+        sim3[0].append(simulation3.getCurrentTime())
+        sim3[1].append(numberOfSimulations)
         
         numberOfSimulations -= 1
-        
-    print(min(sim1))
-    print(min(sim2))
-    print(min(sim3))
+    print(sim1[0])
+    print(sim1[1])
+    figure1("figure1", "Time", "Number of simulations", sim1)
+    figure1("figure2", "Time", "Number of simulations", sim2)
+    figure1("figure3", "Time", "Number of simulations", sim3)
+    print(min(sim1[0]))
+    print(min(sim2[0]))
+    print(min(sim3[0]))
 
-    
+def figure1(filename, ylabel, xlabel, data):
+    plt.plot(data[1], data[0])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.savefig(str(filename) + '.png')
+    plt.clf()   
         
         
 reducingTimeBetweenBatches()
@@ -567,16 +592,20 @@ reducingTimeBetweenBatches()
 def Task_4_OneBatch():
     sim = Simulation(20)
     sim.getPrinter().setOutputFile("OneBatch.txt")
+    sim.createBatches()
     sim.runSimulation()
 
 def Task_4_FewBatches():
     sim = Simulation(150)
     sim.getPrinter().setOutputFile("FewBatches.txt")
+    sim.createBatches()
     sim.runSimulation()
 
 def Task_4_AllBatches():
     sim = Simulation(1000)
     sim.getPrinter().setOutputFile("AllBatches.txt")
+    sim.createBatches()
+
     sim.runSimulation()
     
     
@@ -607,6 +636,8 @@ def Optimization():
 def main():
     simulation = Simulation(1000)
     #Task_5()
+    simulation.createBatches()
+
     simulation.runSimulation()
     #worstCase()
 
