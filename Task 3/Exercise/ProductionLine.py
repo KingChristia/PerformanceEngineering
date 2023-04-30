@@ -12,6 +12,7 @@
 # 1. Imported Modules
 # --------------------
 from collections import deque
+import itertools
 import random
 import sys
 import heapq
@@ -112,9 +113,15 @@ class Task:
 
     def getLoadBuffer(self):
         return self.loadBuffer
+    
+    def setLoadBuffer(self,buffer):
+        self.loadBuffer = buffer
 
     def getUnloadBuffer(self):
         return self.unloadBuffer
+    
+    def setUnloadBuffer(self,buffer):
+        self.unloadBuffer = buffer
 
     def getCurrentlyProcessingBatch(self):
         return self.currentlyProcessingBatch
@@ -157,6 +164,9 @@ class Unit:
 
     def getTasks(self):
         return self.tasks
+
+    def setTasks(self, tasks):
+        self.tasks = tasks
 
     def getCurrentlyProcessingTask(self):
         return self.currentlyProcessingTask
@@ -224,14 +234,73 @@ class ProductionLine:
         self.task8 = Task(8, 1.9, self.buffer8, self.buffer9)
         self.task9 = Task(9, 0.3, self.buffer9, self.buffer10)
 
-        self.tasks = [self.task1, self.task2, self.task3, self.task4,
-                      self.task5, self.task6, self.task7, self.task8, self.task9]
+        # self.task1 = Task(1, 0.5)
+        # self.task2 = Task(2, 3.5)
+        # self.task3 = Task(3, 1.2)
+        # self.task4 = Task(4, 3 )
+        # self.task5 = Task(5, 0.8)
+        # self.task6 = Task(6, 0.5)
+        # self.task7 = Task(7, 1 )
+        # self.task8 = Task(8, 1.9)
+        # self.task9 = Task(9, 0.3)
+
+        #def assignBuffers(self):
+        #   for task in self.tasks:
+        #       for buffer in self.buffers:
+        #           if task.getId() == buffer.getId():
+        #               task.setLoadBuffer(buffer)
+        #           elif task.getId() == buffer.getId()+1:
+        #               task.setUnloadBuffer(buffer)
 
         self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
         self.unit2 = Unit(2, [self.task2, self.task5, self.task7])
         self.unit3 = Unit(3, [self.task4, self.task8])
 
+        # self.unit1 = Unit(1)
+        # self.unit2 = Unit(2)
+        # self.unit3 = Unit(3)
+
+        #def assignTasksToUnits(self):
+        #   self.unit1.setTasks([self.task1, self.task3, self.task6, self.task9])
+        #   self.unit1.setTasks([self.task2, self.task5, self.task7])
+        #   self.unit1.setTasks([self.task4, self.task8])
+        
+        self.buffers = [self.buffer1, self.buffer2, self.buffer3, self.buffer4, self.buffer5, self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.buffer10]
+        self.tasks = [self.task1, self.task2, self.task3, self.task4,self.task5, self.task6, self.task7, self.task8, self.task9]
         self.units = [self.unit1, self.unit2, self.unit3]
+
+        #assignBuffers()
+        #assignTasksToUnits()
+
+
+
+
+    # This only needs to run once
+    def generate_task_permutations(self):
+        unit1_permutations = list(itertools.permutations(self.unit1.tasks))
+        unit2_permutations = list(itertools.permutations(self.unit2.tasks))
+        unit3_permutations = list(itertools.permutations(self.unit3.tasks))
+
+        all_permutations = []
+
+        for perm1 in unit1_permutations:
+            for perm2 in unit2_permutations:
+                for perm3 in unit3_permutations:
+                    all_permutations.append((perm1, perm2, perm3))
+
+        return all_permutations
+
+    def setUnitsOrderingHeuristic(self, heuristic):
+        self.unit1.setTasks(heuristic[0])
+        self.unit2.setTasks(heuristic[1])
+        self.unit3.setTasks(heuristic[2])
+
+        self.units = [self.unit1, self.unit2, self.unit3]
+        
+        
+    def getUnitsOrderingHeuristic(self):
+        return [[task.getId() for task in unit.tasks] for unit in self.units]
+
 
     def getUnits(self):
         return self.units
@@ -341,13 +410,13 @@ class Printer:
 class Simulation:
 
     def __init__(self, wafersToProduce) -> None:
+        self.wafersToProduce = wafersToProduce
         self.eventqueue = []
         self.batches = []
         self.currentTime = 0
         self.productionLine = ProductionLine()
         self.units = self.productionLine.getUnits()
         self.printer = Printer()
-        self.wafersToProduce = wafersToProduce
         self.batchSize = None
         self.interval = 0
         self.timebetween = 60
@@ -603,39 +672,164 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
     plt.clf()
 
 
-def Task_4_OneBatch():
+def changeOrderingHeuristicAndLoadingtimes():
+    numberOfSimulations = 300  # This number changes time between batches
+    results = []
+    sim1 = [[], [], []]  # time and time between batches and permutation
+    sim2 = [[], [], []]  # time and time between batches and permutation
+    sim3 = [[], [], []]  # time, time between batches and permutation
+    simulationForPermutaions = Simulation(1)
+    task_permutations = simulationForPermutaions.getProductionLine(
+    ).generate_task_permutations()
+
+    while numberOfSimulations > 0:
+        simulation1 = Simulation(1000)
+        simulation2 = Simulation(1000)
+        simulation3 = Simulation(1000)
+        for i, permutation in enumerate(task_permutations):
+            print(f"Permutation {i + 1}:")
+            print(
+                f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
+            print(
+                f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
+            print(
+                f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
+            simulation1.getProductionLine().setUnitsOrderingHeuristic(permutation)
+            print(simulation1.getProductionLine().getUnitsOrderingHeuristic())
+            simulation2.getProductionLine().setUnitsOrderingHeuristic(permutation)
+            simulation3.getProductionLine().setUnitsOrderingHeuristic(permutation)
+            # Simulation 1 with batchsize 20
+            simulation1.setBatchSize(20)
+            # Removes the print that runs every simulation
+            simulation1.getPrinter().removeOutput()
+            # Increase time between loading with a constant number
+            simulation1.setInterval(numberOfSimulations)
+            # Change the loading time between batches to be the same number as simulations
+            simulation1.setTimeBetweenBatches(0)
+            simulation1.createBatches()
+            simulation1.runSimulation()
+            sim1[0].append(simulation1.getCurrentTime())
+            sim1[1].append(numberOfSimulations)
+            sim1[2].append(permutation)
+
+            # Simulation 2 with batchsize 50
+
+            simulation2.setBatchSize(50)
+            # Removes the print that runs every simulation
+            simulation2.getPrinter().removeOutput()
+            # Increase time between loading with a constant number
+            simulation2.setInterval(numberOfSimulations)
+            # Change the loading time between batches to be the same number as simulations
+            simulation2.setTimeBetweenBatches(0)
+            simulation2.createBatches()
+            simulation2.runSimulation()
+            sim2[0].append(simulation2.getCurrentTime())
+            sim2[1].append(numberOfSimulations)
+            sim2[2].append(permutation)
+
+            simulation3.setBatchSize(None)
+            # Removes the print that runs every simulation
+            simulation3.getPrinter().removeOutput()
+            # Increase time between loading with a constant number
+            simulation3.setInterval(numberOfSimulations)
+            # Change the loading time between batches to be the same number as simulations
+            simulation3.setTimeBetweenBatches(0)
+            simulation3.createBatches()
+            simulation3.runSimulation()
+            sim3[0].append(simulation3.getCurrentTime())
+            sim3[1].append(numberOfSimulations)
+            sim3[2].append(permutation)
+
+        #Find shortest time, and save the permutation, time and loading time between batches
+        best_sim1 = find_shortest_time(sim1)
+        best_sim2 = find_shortest_time(sim2)
+        best_sim3 = find_shortest_time(sim3)
+        results.append([best_sim1, best_sim2, best_sim3])
+
+        # print("Best results for each simulation:")
+        # print(f"Simulation 1: Time: {best_sim1[0]}, Loading time: {best_sim1[1]}, Permutation: {best_sim1[2]}\n")
+        # print(f"Simulation 2: Time: {best_sim2[0]}, Loading time: {best_sim2[1]}, Permutation: {best_sim2[2]}\n")
+        # print(f"Simulation 3: Time: {best_sim3[0]}, Loading time: {best_sim3[1]}, Permutation: {best_sim3[2]}\n")
+        numberOfSimulations -= 1
+    times = []
+    for run in results:
+        for sim in run:
+            times.append(sim[0])
+            
+    sim1times = times[0::3]
+    sim2times = times[1::3]
+    sim3times = times[2::3]
+    
+    minTimeSim1 = min(sim1times)
+    minTimeSim2 = min(sim2times)
+    minTimeSim3 = min(sim3times)
+    
+    indexForMinTime1 = sim1times.index(minTimeSim1)
+    indexForMinTime2 = sim2times.index(minTimeSim2)
+    indexForMinTime3 = sim3times.index(minTimeSim3)
+    
+    print(f"Best simulation 1: Time: {minTimeSim1}, Loading time: {results[0][indexForMinTime1][1]}, Permutation: {results[0][indexForMinTime1][2]}\n")    
+    print(f"Best simulation 2: Time: {minTimeSim2}, Loading time: {results[1][indexForMinTime2][1]}, Permutation: {results[1][indexForMinTime2][2]}\n")
+    print(f"Best simulation 3: Time: {minTimeSim3}, Loading time: {results[2][indexForMinTime3][1]}, Permutation: {results[2][indexForMinTime3][2]}\n")
+    
+    
+    print(results)
+    
+    
+    
+
+def find_shortest_time(sim_data):
+    shortest_time = float('inf')
+    best_simulation_data = None
+
+    for time, loading_time, permutation in zip(sim_data[0], sim_data[1], sim_data[2]):
+        if time < shortest_time:
+            shortest_time = time
+            best_simulation_data = (time, loading_time, [[task.getId() for task in unit] for unit in permutation])
+
+            
+    return best_simulation_data
+changeOrderingHeuristicAndLoadingtimes()
+
+
+def task_4_OneBatch():
     sim = Simulation(20)
     sim.getPrinter().setOutputFile("OneBatch.txt")
     sim.createBatches()
     sim.runSimulation()
 
 
-def Task_4_FewBatches():
+def task_4_FewBatches():
     sim = Simulation(150)
     sim.getPrinter().setOutputFile("FewBatches.txt")
     sim.createBatches()
     sim.runSimulation()
 
 
-def Task_4_AllBatches():
+def task_4_AllBatches():
+
     sim = Simulation(1000)
     sim.getPrinter().setOutputFile("AllBatches.txt")
     sim.createBatches()
-
     sim.runSimulation()
 
 
-def Task_5():
+def task_5():
     # Worst Case
     return worstCase(), reducingTimeBetweenBatches()
 
 
-def Optimization():
+def task_6():
+    # Change ordering heuristic
+    pass
+
+
+def optimization():
     printer = Printer()
     printer.createDocument(
         "Wafer Production Line - Optimization", "Optimization")
 
-    worstCaseTime, simulations = Task_5()
+    worstCaseTime, simulations = task_5()
     printer.getDocumentWriter().addHeading("2.3 Optimization", 1)
     printer.getDocumentWriter().addHeading("Task 5.", 1)
     printer.getDocumentWriter().addHeading("Simulation with Worst Case", 2)
@@ -645,22 +839,30 @@ def Optimization():
     printer.getDocumentWriter().addHeading(
         "Simulation with reduced loadtime between batches", 2)
     printer.getDocumentWriter().addParagraph("Now we will try to reduce the loading time between the batches. We will simulate 3 simulations, with batch sizes of 20, 50 and random batch size. The graphs below will show the loading times, and the finish time for all 1000 Wafers. The loading time between each batch is increased with a constant number, and the loading time between each batch is the same as the number of simulations. The loading time between each batch is increased from 1 to 300 minutes.")
-    printer.getDocumentWriter().addPicture("figure_batchSize_20.png")
-    printer.getDocumentWriter().addPicture("figure_batchSize_50.png")
-    printer.getDocumentWriter().addPicture("figure_batchSize_50_Whole.png")
-    printer.getDocumentWriter().addPicture("figure_batchSize_Random.png")
+    printer.getDocumentWriter().addPicture("figure_batchSize_20.png", 6)
+    printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " +
+                                             str(min(simulations[0][0])) + " and loading time between batches " + str(simulations[0][1][simulations[0][0].index(min(simulations[0][0]))]) + " minutes.")
+    printer.getDocumentWriter().addPicture("figure_batchSize_50.png", 6)
+    printer.getDocumentWriter().addParagraph("Batchsize 50: The optimal solution is with total time: " +
+                                             str(min(simulations[1][0])) + " and loading time between batches " + str(simulations[1][1][simulations[1][0].index(min(simulations[1][0]))]) + " minutes.")
+    printer.getDocumentWriter().addPicture("figure_batchSize_50_Whole.png", 6)
+    printer.getDocumentWriter().addParagraph(
+        "Observe that the optimal loading time between each task from batchsize 20 and batchsize 50 is proportional to the batchsize.")
+    printer.getDocumentWriter().addPicture("figure_batchSize_Random.png", 6)
+    printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " + str(min(simulations[2][0])) + " and loading time between batches " + str(
+        simulations[2][1][simulations[2][0].index(min(simulations[2][0]))]) + " minutes. NOTE: With random batchsize, the optimal solution is likely to change from run to run.")
 
-Optimization()
+
+# optimization()
 
 # 10. Main
 # --------
 
 
 def main():
-    simulation = Simulation(1000)
+    simulation = Simulation(20)
     # Task_5()
     simulation.createBatches()
-
     simulation.runSimulation()
     # worstCase()
 
@@ -668,7 +870,6 @@ def main():
 
     # sim.printAllBuffers()
 
-
 # main()
 
-Task_4_AllBatches()
+# task_4_AllBatches()
