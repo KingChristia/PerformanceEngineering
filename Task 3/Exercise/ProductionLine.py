@@ -16,6 +16,7 @@ import itertools
 import random
 import sys
 import heapq
+import time
 import DocumentWriter
 import matplotlib.pyplot as plt
 
@@ -653,8 +654,8 @@ def reducingTimeBetweenBatches():
         sim3[1].append(numberOfSimulations)
 
         numberOfSimulations -= 1
-    print(sim1[0])
-    print(sim1[1])
+    #print(sim1[0])
+    #print(sim1[1])
     figure("figure_batchSize_20", "Time", "Loading time between batches",
            sim1, xlim=(50, 125), ylim=(5500, 6600), title="Batchsize 20")
     figure("figure_batchSize_50", "Time", "Loading time between batches",
@@ -684,7 +685,7 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 
 def changeOrderingHeuristicAndLoadingtimes():
-    numberOfSimulations = 110  # This number changes time between batches
+    numberOfSimulations = 300  # This number changes time between batches
     results = []
     sim1 = []  # time and time between batches and permutation
     sim2 = []  # time and time between batches and permutation
@@ -693,10 +694,10 @@ def changeOrderingHeuristicAndLoadingtimes():
     task_permutations = simulationForPermutaions.getProductionLine(
     ).generate_task_permutations()
     ###FJERN DENNE ETTERPÅ
-    task_permutations = task_permutations[100:105]
+    #task_permutations = task_permutations[100:105]
     ###FJERN DENNE ETTERPÅ
 
-    while numberOfSimulations > 105:
+    while numberOfSimulations > 0:
         
         
         best_results_sim1 = [[], [], []]
@@ -710,13 +711,13 @@ def changeOrderingHeuristicAndLoadingtimes():
             simulation1 = Simulation(1000)
             simulation2 = Simulation(1000)
             simulation3 = Simulation(1000)
-            print(f"Permutation {i + 1}:")
-            print(
-                f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
-            print(
-                f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
-            print(
-                f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
+            # print(f"Permutation {i + 1}:")
+            # print(
+            #     f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
+            # print(
+            #     f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
+            # print(
+            #     f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
             simulation1.getProductionLine().setUnitsOrderingHeuristic(permutation)
             simulation2.getProductionLine().setUnitsOrderingHeuristic(permutation)
             simulation3.getProductionLine().setUnitsOrderingHeuristic(permutation)
@@ -782,44 +783,41 @@ def changeOrderingHeuristicAndLoadingtimes():
     allTimeBest1 = min(sim1)
     allTimeBest2 = min(sim2)
     allTimeBest3 = min(sim3)
-    print("\n\nresults of sim1", sim1)
-    print("\n\nresults of sim2", sim2)
-    print("\n\nresults of sim3", sim3)
-    print("All time best\n\n", allTimeBest1)
-    print("All time best\n\n",allTimeBest2)
-    print("All time best\n\n",allTimeBest3)
+    # print("\n\nresults of sim1", sim1)
+    # print("\n\nresults of sim2", sim2)
+    # print("\n\nresults of sim3", sim3)
+    # print("All time best\n\n", allTimeBest1)
+    # print("All time best\n\n",allTimeBest2)
+    # print("All time best\n\n",allTimeBest3)
     
     return allTimeBest1, allTimeBest2, allTimeBest3
     
     
 def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
-    numberOfSimulations = 110  # This number changes time between batches
+    numberOfSimulations = 300  # This number changes time between batches
     sim1 = []  # time and time between batches and permutation
     simulationForPermutaions = Simulation(1)
     task_permutations = simulationForPermutaions.getProductionLine(
     ).generate_task_permutations()
     
     ###FJERN DENNE ETTERPÅ
-    task_permutations = task_permutations[100:105]
+    #task_permutations = task_permutations[100:105]
     ###FJERN DENNE ETTERPÅ
 
-    while numberOfSimulations > 105:
+    while numberOfSimulations > 0:
         
         
         best_results_sim1 = [[], [], []]
         
-        
-        
-        
         for i, permutation in enumerate(task_permutations):
             simulation1 = Simulation(1000)
-            print(f"Permutation {i + 1}:")
-            print(
-                f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
-            print(
-                f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
-            print(
-                f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
+            # print(f"Permutation {i + 1}:")
+            # print(
+            #     f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
+            # print(
+            #     f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
+            # print(
+            #     f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
             simulation1.getProductionLine().setUnitsOrderingHeuristic(permutation)
             # Simulation 1 with batchsize 20
             simulation1.setBatchSize(batchsize)
@@ -849,9 +847,9 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
         numberOfSimulations -= 1
         
     allTimeBest1 = min(sim1)
-    print("\n\nresults of sim1", sim1)
+    #print("\n\nresults of sim1", sim1)
     
-    print("All time best\n\n", allTimeBest1)
+    #print("All time best\n\n", allTimeBest1)
     
     
     return allTimeBest1 
@@ -881,6 +879,12 @@ def task_4_AllBatches():
     sim.createBatches()
     sim.runSimulation()
 
+def task_4():
+    task_4_OneBatch()
+    task_4_FewBatches()
+    task_4_AllBatches()
+    
+    
 
 def task_5():
     # Worst Case
@@ -892,16 +896,32 @@ def task_6():
     return changeOrderingHeuristicAndLoadingtimes()
     
 def task_7():
+    
     results = []
+    
     for batchsize in range(20, 51):
         results.append(changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize))
         
     allTimeBest = min(results)
     batchsize = results.index(allTimeBest) + 20
-    
-    return results
-print(task_7())
+    #print("\nAll time best ", allTimeBest)
+    #print("Batchsize ", batchsize)
+    #print("Length of results ", len(results))
+    batchsizesFigure = [i for i in range(20, 51)]
+    #print(batchsizesFigure)
+    #print("\n\n Results: ", results)
+    first_elements = [sublist[0] for sublist in results]
+    #print("First elements" ,first_elements)
+    figureList = [first_elements, batchsizesFigure]
+    #print("FigureData ", figureList)
+    figure("allTimeBest", "Time" , "Batchsize", figureList, title="All time best")
+    #Results contains the optimal ordering heuristic for each batchsize
+    return results, allTimeBest, batchsize
+
+
+
 def optimization():
+    st = time.time()
     printer = Printer()
     printer.createDocument(
         "Wafer Production Line - Optimization", "Optimization")
@@ -938,14 +958,20 @@ def optimization():
     printer.getDocumentWriter().addParagraph("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
     printer.getDocumentWriter().addParagraph("The best solution for batchsize 50 is with total time: " + str((allTimeBest2[0])) + " and loading time between batches " + str(allTimeBest2[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][2]]) + "]")
     printer.getDocumentWriter().addParagraph("The best solution for batchsize random is with total time: " + str((allTimeBest3[0])) + " and loading time between batches " + str(allTimeBest3[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][2]]) + "]")
-    
+    results, allTimeBest, batchSize = task_7()
     printer.getDocumentWriter().addSection()
     printer.getDocumentWriter().addHeading("Task 7.", 1)
     printer.getDocumentWriter().addHeading("Simulation with different loading time, ordering heuristic and batchsizes", 2)
-    printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 * (50-20) * 300 = 2 592 000 simulations! We will only show the best times for each batch size, but  the best loading time and ordering heuristic for the best time overall with all optimization.")
-
-
-#optimization()
+    printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 permutations * (50-20) batch sizes * 300 loading times = 2 592 000 simulations! We will only show the best times for each batch size, but the best loading time and ordering heuristic for the best time overall with all optimization. This is probably an overkill solution, but will give us the best results and overview into the problem at hand.")
+    printer.getDocumentWriter().addParagraph("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch, " + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][2]]) + "]")
+    printer.getDocumentWriter().addParagraph("\n\nThe figure below shows the optimal time for each batch size, with the most optimal loading time and ordering heuristic. NOTE: The optimal solution is likely to change from run to run since the simulations is run with random batchsizes each time.")
+    printer.getDocumentWriter().addPicture("allTimeBest.png", 6)
+    et = time.time()
+    elapsed_time = round(et - st, 2)
+    print('Execution time:', elapsed_time, 'seconds')
+    printer.getDocumentWriter().addParagraph("Execution time for the whole optimization process: " + str(elapsed_time) + " seconds, ran with a good computer")
+    
+optimization()
 
 # 10. Main
 # --------
