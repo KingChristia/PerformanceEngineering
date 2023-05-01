@@ -771,7 +771,9 @@ def changeOrderingHeuristicAndLoadingtimes():
         sim3.append(best_sim3)
         
         numberOfSimulations -= 1
-    print(sim2)
+    print("\n\nresults of sim1", sim1)
+    print("\n\nresults of sim2", sim2)
+    print("\n\nresults of sim3", sim3)
           
         # #Find shortest time, and save the permutation, time and loading time between batches
         # best_sim1 = find_shortest_time(sim1)
