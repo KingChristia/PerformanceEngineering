@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy your Python file and requirements (if any) into the container
 COPY Task3/Exercise/ProductionLine.py ./
+COPY Task3/Exercise/DocumentWriter.py ./
 COPY Task3/Exercise/requirements.txt ./
 
 # Install any necessary Python packages
