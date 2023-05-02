@@ -526,7 +526,7 @@ class Simulation:
                     batch = self.batches.pop(0)
                     task1.getLoadBuffer().insertBatch(batch)
                     heapq.heappush(self.getEventQueue(), Event(
-                        self.getCurrentTime(), "load", unit1))
+                        self.getCurrentTime() + 1, "load", unit1))
                     self.printer.printLoadedToSim(
                         batch, currentEvent, self.printer.outputLocation)
                 else:
@@ -566,7 +566,7 @@ class Simulation:
                 currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(None)
                 currentUnit.setCurrentlyProcessingTask(None)
                 heapq.heappush(self.eventqueue, Event(
-                    self.currentTime + 0, "load", currentUnit))
+                    self.currentTime + 1, "load", currentUnit))
                 self.printer.printUnload(
                     batch, currentTask, currentEvent, self.printer.outputLocation)
                 # Siste Task på unit 1
