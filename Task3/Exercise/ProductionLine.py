@@ -688,14 +688,14 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 
 def changeOrderingHeuristicAndLoadingtimes():
-    numberOfSimulations = 112  # This number changes time between batches
+    numberOfSimulations = 115  # This number changes time between batches
     results = []
     sim1 = []  # time and time between batches and permutation
     simulationForPermutaions = Simulation(1)
     task_permutations = simulationForPermutaions.getProductionLine(
     ).generate_task_permutations()
     ###FJERN DENNE ETTERPÅ
-    task_permutations = task_permutations[100:200]
+    task_permutations = task_permutations[:100]
     ###FJERN DENNE ETTERPÅ
 
     while numberOfSimulations > 103:
