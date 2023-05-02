@@ -540,11 +540,11 @@ class Simulation:
                     # print(task.getId(), "Her er IDEN!")
                     bool, batch = currentUnit.canProcessBatch(task)
                     if bool:
-                        time = task.processBatch(batch) + 1
+                        time = task.processBatch(batch) 
                         currentUnit.setCurrentlyProcessingTask(task)
                         currentUnit.getCurrentlyProcessingTask().setCurrentlyProcessingBatch(batch)
                         heapq.heappush(self.getEventQueue(), Event(
-                            self.getCurrentTime() + time, "unload", currentUnit))
+                            self.getCurrentTime() + time + 1, "unload", currentUnit))
                         self.printer.printLoad(
                             batch, task, currentEvent, self.printer.outputLocation)
                         continue
