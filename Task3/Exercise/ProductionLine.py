@@ -604,7 +604,7 @@ def worstCase():
 
 
 def reducingTimeBetweenBatches():
-    numberOfSimulations = 10  # This number changes time between batches
+    numberOfSimulations = 250  # This number changes time between batches
     sim1 = [[], []]  # time and time between batches
     sim2 = [[], []]  # time and time between batches
     sim3 = [[], [], []]  # time, time between batches and average batchsize
@@ -652,6 +652,9 @@ def reducingTimeBetweenBatches():
         simulation3.runSimulation()
         sim3[0].append(simulation3.getCurrentTime())
         sim3[1].append(numberOfSimulations)
+        del simulation1
+        del simulation2
+        del simulation3
 
         numberOfSimulations -= 1
     #print(sim1[0])
@@ -685,7 +688,7 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 
 def changeOrderingHeuristicAndLoadingtimes():
-    numberOfSimulations = 300  # This number changes time between batches
+    numberOfSimulations = 1  # This number changes time between batches
     results = []
     sim1 = []  # time and time between batches and permutation
     sim2 = []  # time and time between batches and permutation
@@ -762,6 +765,9 @@ def changeOrderingHeuristicAndLoadingtimes():
             best_results_sim3[0].append(simulation3.getCurrentTime())
             best_results_sim3[1].append(numberOfSimulations)
             best_results_sim3[2].append(permutation)
+            del simulation1
+            del simulation2
+            del simulation3
           
         #Time to find the best result for each simulation
         bestTime_sim1 = min(best_results_sim1[0])
@@ -794,7 +800,7 @@ def changeOrderingHeuristicAndLoadingtimes():
     
     
 def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
-    numberOfSimulations = 300  # This number changes time between batches
+    numberOfSimulations = 1  # This number changes time between batches
     sim1 = []  # time and time between batches and permutation
     simulationForPermutaions = Simulation(1)
     task_permutations = simulationForPermutaions.getProductionLine(
@@ -808,7 +814,7 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
         
         
         best_results_sim1 = [[], [], []]
-        
+        #Permutations is a list of 288 permutation
         for i, permutation in enumerate(task_permutations):
             simulation1 = Simulation(1000)
             # print(f"Permutation {i + 1}:")
@@ -832,6 +838,7 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
             best_results_sim1[0].append(simulation1.getCurrentTime())
             best_results_sim1[1].append(numberOfSimulations)
             best_results_sim1[2].append(permutation)
+            del simulation1
 
             
           
@@ -934,38 +941,38 @@ def optimization():
     printer.getDocumentWriter().addParagraph("This is an example of runtime with the worst case solution. One batch is loaded into the simulation, and the next one is not loaded until the first one is finished. This is repeated until all 1000 wafers is produced. The batch sizes is random from 20 to 50 wafers per batch, and therefore some variation in time between each run. The total runtime is: " + str(worstCaseTime) + " minutes for this simulation.")
 
     # Current optimization with reduced loading times
-    printer.getDocumentWriter().addHeading(
-        "Simulation with reduced loadtime between batches", 2)
-    printer.getDocumentWriter().addParagraph("Now we will try to reduce the loading time between the batches. We will simulate 3 simulations, with batch sizes of 20, 50 and random batch size. The graphs below will show the loading times, and the finish time for all 1000 Wafers. The loading time between each batch is increased with a constant number, and the loading time between each batch is the same as the number of simulations. The loading time between each batch is increased from 1 to 300 minutes.")
-    printer.getDocumentWriter().addPicture("figure_batchSize_20.png", 6)
-    printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " +
-                                             str(min(simulations[0][0])) + " and loading time between batches " + str(simulations[0][1][simulations[0][0].index(min(simulations[0][0]))]) + " minutes.")
-    printer.getDocumentWriter().addPicture("figure_batchSize_50.png", 6)
-    printer.getDocumentWriter().addParagraph("Batchsize 50: The optimal solution is with total time: " +
-                                             str(min(simulations[1][0])) + " and loading time between batches " + str(simulations[1][1][simulations[1][0].index(min(simulations[1][0]))]) + " minutes.")
-    printer.getDocumentWriter().addPicture("figure_batchSize_50_Whole.png", 6)
-    printer.getDocumentWriter().addParagraph(
-        "Observe that the optimal loading time between each task from batchsize 20 and batchsize 50 is proportional to the batchsize.")
-    printer.getDocumentWriter().addPicture("figure_batchSize_Random.png", 6)
-    printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " + str(min(simulations[2][0])) + " and loading time between batches " + str(
-        simulations[2][1][simulations[2][0].index(min(simulations[2][0]))]) + " minutes. NOTE: With random batchsize, the optimal solution is likely to change from run to run.")
+    # printer.getDocumentWriter().addHeading(
+    #     "Simulation with reduced loadtime between batches", 2)
+    # printer.getDocumentWriter().addParagraph("Now we will try to reduce the loading time between the batches. We will simulate 3 simulations, with batch sizes of 20, 50 and random batch size. The graphs below will show the loading times, and the finish time for all 1000 Wafers. The loading time between each batch is increased with a constant number, and the loading time between each batch is the same as the number of simulations. The loading time between each batch is increased from 1 to 300 minutes.")
+    # printer.getDocumentWriter().addPicture("figure_batchSize_20.png", 6)
+    # printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " +
+    #                                          str(min(simulations[0][0])) + " and loading time between batches " + str(simulations[0][1][simulations[0][0].index(min(simulations[0][0]))]) + " minutes.")
+    # printer.getDocumentWriter().addPicture("figure_batchSize_50.png", 6)
+    # printer.getDocumentWriter().addParagraph("Batchsize 50: The optimal solution is with total time: " +
+    #                                          str(min(simulations[1][0])) + " and loading time between batches " + str(simulations[1][1][simulations[1][0].index(min(simulations[1][0]))]) + " minutes.")
+    # printer.getDocumentWriter().addPicture("figure_batchSize_50_Whole.png", 6)
+    # printer.getDocumentWriter().addParagraph(
+    #     "Observe that the optimal loading time between each task from batchsize 20 and batchsize 50 is proportional to the batchsize.")
+    # printer.getDocumentWriter().addPicture("figure_batchSize_Random.png", 6)
+    # printer.getDocumentWriter().addParagraph("Batchsize 20: The optimal solution is with total time: " + str(min(simulations[2][0])) + " and loading time between batches " + str(
+    #     simulations[2][1][simulations[2][0].index(min(simulations[2][0]))]) + " minutes. NOTE: With random batchsize, the optimal solution is likely to change from run to run.")
     
-    printer.getDocumentWriter().addSection()
-    printer.getDocumentWriter().addHeading("Task 6.", 1)
-    printer.getDocumentWriter().addHeading("Simulation with changed ordering heuristic", 2)
-    printer.getDocumentWriter().addParagraph("The previous results show the optimal time with 20, 50 and random batch sizes with standard task prioritization, with Unit 1 : [1, 3, 6, 9], Unit 2 : [2, 5, 7] and Unit 3 : [4, 8]. Now we will change the order tasks are prioritized. It is 288 possible permutations of the tasks, and we will simulate the 3 same simulations. That means 300 simulations, with different load time, times 288 permutations. The total number of simulations is 86 400 per batch size. The results are shown below.")
-    allTimeBest1, allTimeBest2, allTimeBest3 = task_6()
-    printer.getDocumentWriter().addParagraph("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
-    printer.getDocumentWriter().addParagraph("The best solution for batchsize 50 is with total time: " + str((allTimeBest2[0])) + " and loading time between batches " + str(allTimeBest2[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][2]]) + "]")
-    printer.getDocumentWriter().addParagraph("The best solution for batchsize random is with total time: " + str((allTimeBest3[0])) + " and loading time between batches " + str(allTimeBest3[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][2]]) + "]")
-    results, allTimeBest, batchSize = task_7()
-    printer.getDocumentWriter().addSection()
-    printer.getDocumentWriter().addHeading("Task 7.", 1)
-    printer.getDocumentWriter().addHeading("Simulation with different loading time, ordering heuristic and batchsizes", 2)
-    printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 permutations * (50-20) batch sizes * 300 loading times = 2 592 000 simulations! We will only show the best times for each batch size, but the best loading time and ordering heuristic for the best time overall with all optimization. This is probably an overkill solution, but will give us the best results and overview into the problem at hand.")
-    printer.getDocumentWriter().addParagraph("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch, " + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][2]]) + "]")
-    printer.getDocumentWriter().addParagraph("\n\nThe figure below shows the optimal time for each batch size, with the most optimal loading time and ordering heuristic. NOTE: The optimal solution is likely to change from run to run since the simulations is run with random batchsizes each time.")
-    printer.getDocumentWriter().addPicture("allTimeBest.png", 6)
+    # printer.getDocumentWriter().addSection()
+    # printer.getDocumentWriter().addHeading("Task 6.", 1)
+    # printer.getDocumentWriter().addHeading("Simulation with changed ordering heuristic", 2)
+    # printer.getDocumentWriter().addParagraph("The previous results show the optimal time with 20, 50 and random batch sizes with standard task prioritization, with Unit 1 : [1, 3, 6, 9], Unit 2 : [2, 5, 7] and Unit 3 : [4, 8]. Now we will change the order tasks are prioritized. It is 288 possible permutations of the tasks, and we will simulate the 3 same simulations. That means 300 simulations, with different load time, times 288 permutations. The total number of simulations is 86 400 per batch size. The results are shown below.")
+    # allTimeBest1, allTimeBest2, allTimeBest3 = task_6()
+    # printer.getDocumentWriter().addParagraph("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
+    # printer.getDocumentWriter().addParagraph("The best solution for batchsize 50 is with total time: " + str((allTimeBest2[0])) + " and loading time between batches " + str(allTimeBest2[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest2[2][2]]) + "]")
+    # printer.getDocumentWriter().addParagraph("The best solution for batchsize random is with total time: " + str((allTimeBest3[0])) + " and loading time between batches " + str(allTimeBest3[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest3[2][2]]) + "]")
+    # results, allTimeBest, batchSize = task_7()
+    # printer.getDocumentWriter().addSection()
+    # printer.getDocumentWriter().addHeading("Task 7.", 1)
+    # printer.getDocumentWriter().addHeading("Simulation with different loading time, ordering heuristic and batchsizes", 2)
+    # printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 permutations * (50-20) batch sizes * 300 loading times = 2 592 000 simulations! We will only show the best times for each batch size, but the best loading time and ordering heuristic for the best time overall with all optimization. This is probably an overkill solution, but will give us the best results and overview into the problem at hand.")
+    # printer.getDocumentWriter().addParagraph("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch, " + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][2]]) + "]")
+    # printer.getDocumentWriter().addParagraph("\n\nThe figure below shows the optimal time for each batch size, with the most optimal loading time and ordering heuristic. NOTE: The optimal solution is likely to change from run to run since the simulations is run with random batchsizes each time.")
+    # printer.getDocumentWriter().addPicture("allTimeBest.png", 6)
     et = time.time()
     elapsed_time = round(et - st, 2)
     print('Execution time:', elapsed_time, 'seconds')
