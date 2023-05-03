@@ -695,7 +695,7 @@ def changeOrderingHeuristicAndLoadingtimes():
     task_permutations = simulationForPermutaions.getProductionLine(
     ).generate_task_permutations()
     ###FJERN DENNE ETTERPÅ
-    task_permutations = task_permutations[:100]
+    task_permutations = task_permutations[240:]
     ###FJERN DENNE ETTERPÅ
 
     while numberOfSimulations > 103:
