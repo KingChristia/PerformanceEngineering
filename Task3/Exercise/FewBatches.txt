@@ -1,0 +1,103 @@
+
+Here is a simulation of 5 Batches running`
+The batches are produced randomly and have an average size of 30.0
+The total runTime is found at the bottom
+
+Loaded batch 1 with size 21 to simulation at time 60
+Loaded batch 2 with size 40 to simulation at time 60
+Loaded batch 3 with size 36 to simulation at time 60
+Loaded batch 1 to task 1 at time 61
+Loaded batch 4 with size 37 to simulation at time 61
+Unloaded batch 1 from task 1 at time 72.0
+Loaded batch 2 to task 1 at time 73.0
+Loaded batch 1 to task 2 at time 73.0
+Loaded batch 5 with size 16 to simulation at time 73
+Unloaded batch 2 from task 1 at time 94.0
+Loaded batch 3 to task 1 at time 95.0
+Unloaded batch 3 from task 1 at time 114.0
+Loaded batch 4 to task 1 at time 115.0
+Unloaded batch 4 from task 1 at time 134.0
+Unloaded batch 1 from task 2 at time 148.0
+Loaded batch 2 to task 2 at time 149.0
+Loaded batch 5 to task 1 at time 149.0
+Unloaded batch 5 from task 1 at time 158.0
+Loaded batch 1 to task 3 at time 159.0
+Unloaded batch 1 from task 3 at time 185.0
+Loaded batch 1 to task 4 at time 186.0
+Unloaded batch 1 from task 4 at time 250.0
+Unloaded batch 2 from task 2 at time 290.0
+Loaded batch 3 to task 2 at time 291.0
+Loaded batch 2 to task 3 at time 291.0
+Unloaded batch 2 from task 3 at time 340.0
+Loaded batch 2 to task 4 at time 341.0
+Unloaded batch 3 from task 2 at time 418.0
+Loaded batch 4 to task 2 at time 419.0
+Loaded batch 3 to task 3 at time 419.0
+Unloaded batch 2 from task 4 at time 462.0
+Unloaded batch 3 from task 3 at time 463.0
+Loaded batch 3 to task 4 at time 463.0
+Unloaded batch 4 from task 2 at time 550.0
+Loaded batch 5 to task 2 at time 551.0
+Loaded batch 4 to task 3 at time 551.0
+Unloaded batch 3 from task 4 at time 572.0
+Unloaded batch 4 from task 3 at time 596.0
+Unloaded batch 5 from task 2 at time 608.0
+Loaded batch 1 to task 5 at time 609.0
+Loaded batch 5 to task 3 at time 609.0
+Unloaded batch 1 from task 5 at time 627.0
+Loaded batch 2 to task 5 at time 628.0
+Unloaded batch 5 from task 3 at time 629.0
+Loaded batch 1 to task 6 at time 630.0
+Loaded batch 4 to task 4 at time 630.0
+Unloaded batch 1 from task 6 at time 641.0
+Unloaded batch 2 from task 5 at time 661.0
+Loaded batch 3 to task 5 at time 662.0
+Loaded batch 2 to task 6 at time 662.0
+Unloaded batch 2 from task 6 at time 683.0
+Unloaded batch 3 from task 5 at time 692.0
+Loaded batch 1 to task 7 at time 693.0
+Loaded batch 3 to task 6 at time 693.0
+Unloaded batch 3 from task 6 at time 712.0
+Unloaded batch 1 from task 7 at time 715.0
+Loaded batch 2 to task 7 at time 716.0
+Unloaded batch 4 from task 4 at time 742.0
+Loaded batch 5 to task 4 at time 743.0
+Unloaded batch 2 from task 7 at time 757.0
+Loaded batch 4 to task 5 at time 758.0
+Unloaded batch 4 from task 5 at time 789.0
+Loaded batch 3 to task 7 at time 790.0
+Loaded batch 4 to task 6 at time 790.0
+Unloaded batch 5 from task 4 at time 792.0
+Loaded batch 1 to task 8 at time 793.0
+Unloaded batch 4 from task 6 at time 809.0
+Unloaded batch 3 from task 7 at time 827.0
+Loaded batch 5 to task 5 at time 828.0
+Unloaded batch 1 from task 8 at time 834.0
+Loaded batch 2 to task 8 at time 835.0
+Loaded batch 1 to task 9 at time 835.0
+Unloaded batch 5 from task 5 at time 842.0
+Unloaded batch 1 from task 9 at time 842.0
+Loaded batch 4 to task 7 at time 843.0
+Loaded batch 5 to task 6 at time 843.0
+Unloaded batch 5 from task 6 at time 852.0
+Unloaded batch 4 from task 7 at time 881.0
+Loaded batch 5 to task 7 at time 882.0
+Unloaded batch 5 from task 7 at time 899.0
+Unloaded batch 2 from task 8 at time 912.0
+Loaded batch 3 to task 8 at time 913.0
+Loaded batch 2 to task 9 at time 913.0
+Unloaded batch 2 from task 9 at time 926.0
+Unloaded batch 3 from task 8 at time 982.0
+Loaded batch 4 to task 8 at time 983.0
+Loaded batch 3 to task 9 at time 983.0
+Unloaded batch 3 from task 9 at time 995.0
+Unloaded batch 4 from task 8 at time 1054.0
+Loaded batch 5 to task 8 at time 1055.0
+Loaded batch 4 to task 9 at time 1055.0
+Unloaded batch 4 from task 9 at time 1067.0
+Unloaded batch 5 from task 8 at time 1086.0
+Loaded batch 5 to task 9 at time 1087.0
+Unloaded batch 5 from task 9 at time 1093.0
+
+
+Total runtime was 1094.0
