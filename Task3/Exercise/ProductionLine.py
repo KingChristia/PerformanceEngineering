@@ -604,14 +604,14 @@ def worstCase():
 
 
 def reducingTimeBetweenBatches():
-    numberOfSimulations = 130  # This number changes time between batches
+    numberOfSimulations = 300  # This number changes time between batches
     sim1 = [[], []]  # time and time between batches
     sim2 = [[], []]  # time and time between batches
     sim3 = [[], [], []]  # time, time between batches and average batchsize
-    while numberOfSimulations > 50:
-        simulation1 = Simulation(1000)
+    while numberOfSimulations > 80:
+        simulation1 = Simulation(1)
         simulation2 = Simulation(1)
-        simulation3 = Simulation(1)
+        simulation3 = Simulation(1000)
 
         # Simulation 1 with batchsize 20
         simulation1.setBatchSize(20)
@@ -660,7 +660,7 @@ def reducingTimeBetweenBatches():
     #print(sim1[0])
     #print(sim1[1])
     figure("figure_batchSize_20", "Time", "Loading time between batches",
-           sim1, xlim=(50, 125), ylim=(5500, 6600), title="Batchsize 20")
+           sim1, xlim=(0, 125), ylim=(5700, 7200), title="Batchsize 20")
     figure("figure_batchSize_50", "Time", "Loading time between batches",
            sim2, xlim=(240, 300), ylim=(5700, 6600), title="Batchsize 50")
     figure("figure_batchSize_50_Whole", "Time", "Loading time between batches",
@@ -688,7 +688,7 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 
 def changeOrderingHeuristicAndLoadingtimes():
-    numberOfSimulations = 115  # This number changes time between batches
+    numberOfSimulations = 120  # This number changes time between batches
     results = []
     sim1 = []  # time and time between batches and permutation
     simulationForPermutaions = Simulation(1)
@@ -698,7 +698,7 @@ def changeOrderingHeuristicAndLoadingtimes():
     task_permutations = task_permutations[240:]
     ###FJERN DENNE ETTERPÅ
 
-    while numberOfSimulations > 103:
+    while numberOfSimulations > 100:
         
         best_results_sim1 = [[], [], []]
         
@@ -936,6 +936,17 @@ st = time.time()
 
 allTimeBest1 = changeOrderingHeuristicAndLoadingtimes()
 print("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
+#worstCaseTime, simulations = task_5()
+#print("This is an example of runtime with the worst case solution. One batch is loaded into the simulation, and the next one is not loaded until the first one is finished. This is repeated until all 1000 wafers is produced. The batch sizes is random from 20 to 50 wafers per batch, and therefore some variation in time between each run. The total runtime is: " + str(worstCaseTime) + " minutes for this simulation.")
+#print("Batchsize 20: The optimal solution is with total time: " +
+#                                             str(min(simulations[0][0])) + " and loading time between batches " + str(simulations[0][1][simulations[0][0].index(min(simulations[0][0]))]) + " minutes.")
+#print("Batchsize 50: The optimal solution is with total time: " +
+#                                             str(min(simulations[1][0])) + " and loading time between batches " + str(simulations[1][1][simulations[1][0].index(min(simulations[1][0]))]) + " minutes.")
+#
+#print("Batchsize 20: The optimal solution is with total time: " + str(min(simulations[2][0])) + " and loading time between batches " + str(
+#        simulations[2][1][simulations[2][0].index(min(simulations[2][0]))]) + " minutes. NOTE: With random batchsize, the optimal solution is likely to change from run to run.")
+
+
 et = time.time()
 elapsed_time = round(et - st, 2)
 print('Execution time:', elapsed_time, 'seconds')
