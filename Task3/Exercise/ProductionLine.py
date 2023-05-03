@@ -275,14 +275,13 @@ class ProductionLine:
         # assignTasksToUnits()
 
     def setBestOrderingHeuristic(self):
-        self.unit1 = Unit(1, [self.task9, self.task3, self.task1, self.task6])
-        self.unit2 = Unit(2, [self.task5, self.task7, self.task2])
-        self.unit3 = Unit(3, [self.task4, self.task8])
+        self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
+        self.unit2 = Unit(2, [self.task5, self.task7,self.task2])
+        self.unit3 = Unit(3, [self.task8, self.task4])
 
         self.buffers = [self.buffer1, self.buffer2, self.buffer3, self.buffer4, self.buffer5,
                         self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.buffer10]
-        self.tasks = [self.task9, self.task3, self.task1, self.task6, self.task5, self.task7,
-                      self.task2, self.task4, self.task8]  # OPTIMAL ORDERIN HEURISTIC FOUND IN TASK 6
+        self.tasks = [self.task1, self.task3, self.task6, self.task9,self.task5, self.task7,self.task2, self.task8, self.task4]  # OPTIMAL ORDERIN HEURISTIC FOUND IN TASK 6
         self.units = [self.unit1, self.unit2, self.unit3]
     # This only needs to run once
 
