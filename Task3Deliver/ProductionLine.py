@@ -216,42 +216,20 @@ class ProductionLine:
         self.task8 = Task(8, 1.9, self.buffer8, self.buffer9)
         self.task9 = Task(9, 0.3, self.buffer9, self.buffer10)
 
-        # self.task1 = Task(1, 0.5)
-        # self.task2 = Task(2, 3.5)
-        # self.task3 = Task(3, 1.2)
-        # self.task4 = Task(4, 3 )
-        # self.task5 = Task(5, 0.8)
-        # self.task6 = Task(6, 0.5)
-        # self.task7 = Task(7, 1 )
-        # self.task8 = Task(8, 1.9)
-        # self.task9 = Task(9, 0.3)
-
-        # def assignBuffers(self):
-        #   for task in self.tasks:
-        #       for buffer in self.buffers:
-        #           if task.getId() == buffer.getId():
-        #               task.setLoadBuffer(buffer)
-        #           elif task.getId() == buffer.getId()+1:
-        #               task.setUnloadBuffer(buffer)
-
         self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
         self.unit2 = Unit(2, [self.task2, self.task5, self.task7])
         self.unit3 = Unit(3, [self.task4, self.task8])
 
-        # self.unit1 = Unit(1)
-        # self.unit2 = Unit(2)
-        # self.unit3 = Unit(3)
 
         self.tasks = [self.task1, self.task2, self.task3, self.task4,
                       self.task5, self.task6, self.task7, self.task8, self.task9]
 
         self.buffers = [self.buffer1, self.buffer2, self.buffer3, self.buffer4, self.buffer5,
                         self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.buffer10]
+        
         self.units = [self.unit1, self.unit2, self.unit3]
 
-        # assignBuffers()
-        # assignTasksToUnits()
-
+    #Used in task 7
     def setBestOrderingHeuristic(self):
         self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
         self.unit2 = Unit(2, [self.task5, self.task7,self.task2])
@@ -261,8 +239,9 @@ class ProductionLine:
                         self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.buffer10]
         self.tasks = [self.task1, self.task3, self.task6, self.task9,self.task5, self.task7,self.task2, self.task8, self.task4]  # OPTIMAL ORDERIN HEURISTIC FOUND IN TASK 6
         self.units = [self.unit1, self.unit2, self.unit3]
-    # This only needs to run once
-
+    
+    
+    # This only needs to run once, used in Task 6
     def generate_task_permutations(self):
         unit1_permutations = list(itertools.permutations(self.unit1.tasks))
         unit2_permutations = list(itertools.permutations(self.unit2.tasks))
@@ -276,16 +255,13 @@ class ProductionLine:
                     all_permutations.append((perm1, perm2, perm3))
 
         return all_permutations
-
+    
+    #Used in Task 6 to set order heuristic
     def setUnitsOrderingHeuristic(self, heuristic):
         self.unit1.setTasks(heuristic[0])
         self.unit2.setTasks(heuristic[1])
         self.unit3.setTasks(heuristic[2])
-        import itertools
-
         self.tasks = list(itertools.chain(*heuristic))
-
-        
         self.units = [self.unit1, self.unit2, self.unit3]
 
     def getUnitsOrderingHeuristic(self):
@@ -579,7 +555,7 @@ class Simulation:
             if task.getId() == 9:
                 print("Simulation finished", self.currentTime, "And produced a total of",
               task.getUnloadBuffer().getBufferLoad(), "wafers")
-                #I want to reset the buffer here
+                #Reset bufferen for bedre kjøretid på simulering
                 task.getUnloadBuffer().resetBatch()
         
 
@@ -656,8 +632,7 @@ def reducingTimeBetweenBatches():
         del simulation3
 
         numberOfSimulations -= 1
-    # print(sim1[0])
-    # print(sim1[1])
+    
     figure("figure_batchSize_20", "Time", "Loading time between batches",
            sim1, xlim=(0, 125), ylim=(5700, 7200), title="Batchsize 20")
     figure("figure_batchSize_50", "Time", "Loading time between batches",
@@ -667,9 +642,6 @@ def reducingTimeBetweenBatches():
     figure("figure_batchSize_Random", "Time", "Loading time between batches",
            sim3, xlim=None, ylim=None, title="Random batchsize per simulation")
 
-    # print(min(sim1[0]))
-    # print(min(sim2[0]))
-    # print(min(sim3[0]))
     return [sim1, sim2, sim3]
 
 
@@ -688,7 +660,6 @@ def figure(filename, ylabel, xlabel, data, xlim=None, ylim=None, title=None):
 
 def changeOrderingHeuristicAndLoadingtimes():
     numberOfSimulations = 300  # This number changes time between batches
-    results = []
     sim1 = []  # time and time between batches and permutation
     simulationForPermutaions = Simulation(1)
     task_permutations = simulationForPermutaions.getProductionLine(
@@ -701,16 +672,7 @@ def changeOrderingHeuristicAndLoadingtimes():
         for i, permutation in enumerate(task_permutations):
             print(f"Simulation nr {numberOfSimulations} and permutation nr {i}")
             simulation1 = Simulation(1000)
-            # print(f"Permutation {i + 1}:")
-            # print(
-            #     f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
-            # print(
-            #     f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
-            # print(
-            #     f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
             simulation1.getProductionLine().setUnitsOrderingHeuristic(permutation)
-            #print(simulation1.getProductionLine().getUnitsOrderingHeuristic())
-
             # Simulation 1 with batchsize 20
             simulation1.setBatchSize(20)
             # Removes the print that runs every simulation
@@ -738,14 +700,6 @@ def changeOrderingHeuristicAndLoadingtimes():
         numberOfSimulations -= 1
 
     allTimeBest1 = min(sim1)
-
-    # print("\n\nresults of sim1", sim1)
-    # print("\n\nresults of sim2", sim2)
-    # print("\n\nresults of sim3", sim3)
-    # print("All time best\n\n", allTimeBest1)
-    # print("All time best\n\n",allTimeBest2)
-    # print("All time best\n\n",allTimeBest3)
-
     return allTimeBest1
 
 
@@ -759,7 +713,6 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
 
         simulation1 = Simulation(1000)
         simulation1.getProductionLine().setBestOrderingHeuristic()
-        # print(simulation1.getProductionLine().getUnitsOrderingHeuristic())
 
         # Simulation 1 with batchsize 20
         simulation1.setBatchSize(batchsize)
@@ -782,22 +735,12 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
         # Find where in the simulation that happens
         best_sim1 = [bestTime_sim1, best_results_sim1[1]
                      [best_results_sim1[0].index(bestTime_sim1)]]
-
         # Add the best permutation to the list
         sim1.append(best_sim1)
-
         numberOfSimulations -= 1
-
+        
     allTimeBest1 = min(sim1)
-    # print("\n\nresults of sim1", sim1)
-
-    # print("All time best\n\n", allTimeBest1)
-
     return allTimeBest1
-
-
-# changeOrderingHeuristicAndLoadingtimes()
-
 
 def task_4_OneBatch():
     sim = Simulation(20)
@@ -819,7 +762,6 @@ def task_4_AllBatches():
     sim.getPrinter().setOutputFile("AllBatches.txt")
     sim.createBatches()
     sim.runSimulation()
-
 
 def task_4():
     task_4_OneBatch()
@@ -848,16 +790,13 @@ def task_7():
 
     allTimeBest = min(results)
     batchsize = results.index(allTimeBest) + 20
-    # print("\nAll time best ", allTimeBest)
-    # print("Batchsize ", batchsize)
-    # print("Length of results ", len(results))
     batchsizesFigure = [i for i in range(20, 51)]
-    # print(batchsizesFigure)
-    # print("\n\n Results: ", results)
+    
+    #Used to extract correct Data
     first_elements = [sublist[0] for sublist in results]
-    # print("First elements" ,first_elements)
+
     figureList = [first_elements, batchsizesFigure]
-    # print("FigureData ", figureList)
+
     figure("allTimeBest", "Time", "Batchsize",
            figureList, title="All time best")
     # Results contains the optimal ordering heuristic for each batchsize
