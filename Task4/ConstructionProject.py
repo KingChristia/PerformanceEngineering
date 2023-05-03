@@ -16,7 +16,7 @@ class Task:
         self.mode = duration[1]
         self.max = duration[2]
 
-        self.duration = round(random.triangular(self.min,self.max,self.mode),2)
+        self.duration = self.mode #round(random.triangular(self.min,self.max,self.mode),2)
 
         self.ES = 0
         self.EF = 0
