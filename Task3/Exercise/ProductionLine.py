@@ -253,8 +253,8 @@ class ProductionLine:
         #           elif task.getId() == buffer.getId()+1:
         #               task.setUnloadBuffer(buffer)
 
-        self.unit1 = Unit(1, [self.task1, self.task3, self.task6, self.task9])
-        self.unit2 = Unit(2, [self.task2, self.task5, self.task7])
+        self.unit1 = Unit(1, [self.task9, self.task3, self.task1, self.task6])
+        self.unit2 = Unit(2, [self.task5, self.task7, self.task2])
         self.unit3 = Unit(3, [self.task4, self.task8])
 
         # self.unit1 = Unit(1)
@@ -267,7 +267,8 @@ class ProductionLine:
         #   self.unit1.setTasks([self.task4, self.task8])
         
         self.buffers = [self.buffer1, self.buffer2, self.buffer3, self.buffer4, self.buffer5, self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.buffer10]
-        self.tasks = [self.task1, self.task2, self.task3, self.task4,self.task5, self.task6, self.task7, self.task8, self.task9]
+        #self.tasks = [self.task1, self.task2, self.task3, self.task4,self.task5, self.task6, self.task7, self.task8, self.task9]
+        self.tasks = [self.task9, self.task3, self.task1, self.task6, self.task5, self.task7, self.task2, self.task4, self.task8] #OPTIMAL ORDERIN HEURISTIC FOUND IN TASK 6
         self.units = [self.unit1, self.unit2, self.unit3]
 
         #assignBuffers()
@@ -493,6 +494,8 @@ class Simulation:
 
         while self.wafersToProduce > 0:
             batch = Batch(index+1, self.getBatchSize())
+            if batch.getBatchSize() > self.wafersToProduce:
+                batch = Batch(index + 1, self.wafersToProduce)
             self.wafersToProduce -= batch.getBatchSize()
             self.addBatches(batch)
             heapq.heappush(self.eventqueue, Event(
@@ -582,7 +585,7 @@ class Simulation:
                         self.currentTime + 1, "load", self.productionLine.getUnitFromTask(nextTask)))
 
         self.printer.printTotal(self, self.printer.outputLocation)
-        print("Simulation finished", self.currentTime)
+        print("Simulation finished", self.currentTime, "And produced a total of", self.getProductionLine().getTasks()[0].getUnloadBuffer().getBufferLoad(), "wafers")
 
 
 # 10. Optimization
@@ -755,45 +758,33 @@ def changeOrderingHeuristicAndLoadingtimes():
     
     
 def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
-    numberOfSimulations = 1  # This number changes time between batches
+    numberOfSimulations = 300  # This number changes time between batches
     sim1 = []  # time and time between batches and permutation
-    simulationForPermutaions = Simulation(1)
-    task_permutations = simulationForPermutaions.getProductionLine(
-    ).generate_task_permutations()
-    
-    ###FJERN DENNE ETTERPÅ
-    #task_permutations = task_permutations[100:105]
-    ###FJERN DENNE ETTERPÅ
+   
 
     while numberOfSimulations > 0:
         
         
-        best_results_sim1 = [[], [], []]
-        #Permutations is a list of 288 permutation
-        for i, permutation in enumerate(task_permutations):
-            simulation1 = Simulation(1000)
-            # print(f"Permutation {i + 1}:")
-            # print(
-            #     f"  Unit 1: {permutation[0][0].getId()}, {permutation[0][1].getId()}, {permutation[0][2].getId()}, {permutation[0][3].getId()}")
-            # print(
-            #     f"  Unit 2: {permutation[1][0].getId()}, {permutation[1][1].getId()}, {permutation[1][2].getId()}")
-            # print(
-            #     f"  Unit 3: {permutation[2][0].getId()}, {permutation[2][1].getId()}\n")
-            simulation1.getProductionLine().setUnitsOrderingHeuristic(permutation)
-            # Simulation 1 with batchsize 20
-            simulation1.setBatchSize(batchsize)
-            # Removes the print that runs every simulation
-            simulation1.getPrinter().removeOutput()
-            # Increase time between loading with a constant number
-            simulation1.setInterval(numberOfSimulations)
-            # Change the loading time between batches to be the same number as simulations
-            simulation1.setTimeBetweenBatches(0)
-            simulation1.createBatches()
-            simulation1.runSimulation()
-            best_results_sim1[0].append(simulation1.getCurrentTime())
-            best_results_sim1[1].append(numberOfSimulations)
-            best_results_sim1[2].append(permutation)
-            del simulation1
+        best_results_sim1 = [[], []]
+       
+        simulation1 = Simulation(1000)
+        #print(simulation1.getProductionLine().getUnitsOrderingHeuristic())
+            
+
+        # Simulation 1 with batchsize 20
+        simulation1.setBatchSize(batchsize)
+        # Removes the print that runs every simulation
+        simulation1.getPrinter().removeOutput()
+        # Increase time between loading with a constant number
+        simulation1.setInterval(numberOfSimulations)
+        # Change the loading time between batches to be the same number as simulations
+        simulation1.setTimeBetweenBatches(0)
+        simulation1.createBatches()
+        simulation1.runSimulation()
+        best_results_sim1[0].append(simulation1.getCurrentTime())
+        best_results_sim1[1].append(numberOfSimulations)
+
+        del simulation1
 
             
           
@@ -801,7 +792,7 @@ def changeOrderingHeuristicAndLoadingtimesAndBatchsize(batchsize):
         bestTime_sim1 = min(best_results_sim1[0])
        
         #Find where in the simulation that happens
-        best_sim1 = [bestTime_sim1, best_results_sim1[1][best_results_sim1[0].index(bestTime_sim1)], best_results_sim1[2][best_results_sim1[0].index(bestTime_sim1)]]
+        best_sim1 = [bestTime_sim1, best_results_sim1[1][best_results_sim1[0].index(bestTime_sim1)]]
        
         #Add the best permutation to the list
         sim1.append(best_sim1)
@@ -933,9 +924,10 @@ def optimization():
     
 #optimization()
 st = time.time()
-
-allTimeBest1 = changeOrderingHeuristicAndLoadingtimes()
-print("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
+results, allTimeBest, batchSize = task_7()
+print("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch")
+#allTimeBest1 = changeOrderingHeuristicAndLoadingtimes()
+#print("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
 #worstCaseTime, simulations = task_5()
 #print("This is an example of runtime with the worst case solution. One batch is loaded into the simulation, and the next one is not loaded until the first one is finished. This is repeated until all 1000 wafers is produced. The batch sizes is random from 20 to 50 wafers per batch, and therefore some variation in time between each run. The total runtime is: " + str(worstCaseTime) + " minutes for this simulation.")
 #print("Batchsize 20: The optimal solution is with total time: " +
