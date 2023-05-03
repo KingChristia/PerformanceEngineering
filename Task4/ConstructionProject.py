@@ -1,6 +1,7 @@
 
 
 import pandas as pd
+import random
 
 class Task:
 
@@ -15,7 +16,7 @@ class Task:
         self.mode = duration[1]
         self.max = duration[2]
 
-        self.duration = self.mode
+        self.duration = round(random.triangular(self.min,self.max,self.mode),2)
 
         self.ES = 0
         self.EF = 0
@@ -48,7 +49,7 @@ class Task:
             self.successors.remove(successor)
     
     def __str__(self):
-        return f"Task {self.id}, {self.description}, duration: ({self.min}, {self.mode}, {self.max}), predecessors: {self.predecessors}, successors: {self.successors})"
+        return f"Task {self.id}, {self.description}, duration: ({self.min}, {self.mode}, {self.max}), predecessors: {[predecessor.id for predecessor in self.predecessors]}, successors: {[sucsessors.id for sucsessors in self.successors]} , ES: {self.ES}, EF: {self.EF}, LS: {self.LS}, LF: {self.LF}, slack: {self.slack}, critical: {self.critical}"
 
 
 class PERTdiagram:
@@ -106,16 +107,16 @@ class PERTdiagram:
         predecessor_task = self.find_task_by_id(predecessor)
         successor_task = self.find_task_by_id(successor)
         if predecessor_task and successor_task:
-            predecessor_task.add_successor(successor)
-            successor_task.add_predecessor(predecessor)
+            predecessor_task.add_successor(successor_task)
+            successor_task.add_predecessor(predecessor_task)
 
     def disconnect_tasks(self, predecessor, successor):
         predecessor_task = self.find_task_by_id(predecessor)
         successor_task = self.find_task_by_id(successor)
 
         if predecessor_task and successor_task:
-            predecessor_task.remove_successor(successor)
-            successor_task.remove_predecessor(predecessor)
+            predecessor_task.remove_successor(successor_task)
+            successor_task.remove_predecessor(predecessor_task)
 
     def find_task_by_id(self, task_id):
         for task in self.tasks:
@@ -131,12 +132,14 @@ class PERTdiagram:
 
     def forwardPass(self):
         for task in self.tasks:
-            if len(task.predecessors) == 0:
+            if task.id == 'Start':
+                continue
+            if task.predecessors == ['Start']:
                 task.ES = 0
                 task.EF = task.duration
             else:
                 task.ES = max([t.EF for t in task.predecessors])
-                task.EF = task.ES + task.duration
+                task.EF = round(task.ES + task.duration,2)
 
     def backwardPass(self):
         for task in reversed(self.tasks):
@@ -145,7 +148,7 @@ class PERTdiagram:
                 task.LS = task.LF - task.duration
             else:
                 task.LF = min([t.LS for t in task.successors])
-                task.LS = task.LF - task.duration
+                task.LS = round(task.LF - task.duration,2)
 
     def findCriticalPath(self):
         for task in self.tasks:
@@ -166,8 +169,10 @@ class PERTdiagram:
 
 def main():
     pert = PERTdiagram()
-    #pert.collectProjectFromExcel('Warehouse.xlsx','Warehouse')
-    pert.collectProjectFromExcel('Villa.xlsx','Villa')
+    pert.collectProjectFromExcel('Warehouse.xlsx','Warehouse')
+    #pert.collectProjectFromExcel('Villa.xlsx','Villa')
+    pert.forwardPass()
+    pert.backwardPass()
     pert.print_all_tasks()
 
 
