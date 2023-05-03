@@ -909,57 +909,26 @@ def optimization():
     printer.getDocumentWriter().addParagraph("The previous results show the optimal time with 20, 50 and random batch sizes with standard task prioritization, with Unit 1 : [1, 3, 6, 9], Unit 2 : [2, 5, 7] and Unit 3 : [4, 8]. Now we will change the order tasks are prioritized. It is 288 possible permutations of the tasks, and we will simulate the 3 same simulations. That means 300 simulations, with different load time, times 288 permutations. The total number of simulations is 86 400 per batch size. The results are shown below.")
     allTimeBest1 = task_6()
     printer.getDocumentWriter().addParagraph("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
-    # results, allTimeBest, batchSize = task_7()
-    # printer.getDocumentWriter().addSection()
-    # printer.getDocumentWriter().addHeading("Task 7.", 1)
-    # printer.getDocumentWriter().addHeading("Simulation with different loading time, ordering heuristic and batchsizes", 2)
-    # printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 permutations * (50-20) batch sizes * 300 loading times = 2 592 000 simulations! We will only show the best times for each batch size, but the best loading time and ordering heuristic for the best time overall with all optimization. This is probably an overkill solution, but will give us the best results and overview into the problem at hand.")
-    # printer.getDocumentWriter().addParagraph("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch, " + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest[2][2]]) + "]")
-    # printer.getDocumentWriter().addParagraph("\n\nThe figure below shows the optimal time for each batch size, with the most optimal loading time and ordering heuristic. NOTE: The optimal solution is likely to change from run to run since the simulations is run with random batchsizes each time.")
-    # printer.getDocumentWriter().addPicture("allTimeBest.png", 6)
+    results, allTimeBest, batchSize = task_7()
+    printer.getDocumentWriter().addSection()
+    printer.getDocumentWriter().addHeading("Task 7.", 1)
+    printer.getDocumentWriter().addHeading("Simulation with different loading time, ordering heuristic and batchsizes", 2)
+    printer.getDocumentWriter().addParagraph("Now we will simulate the same as in task 6, but with different batch sizes for each simulation. That means that we will run 288 permutations * (50-20) batch sizes * 300 loading times = 2 592 000 simulations! We will only show the best times for each batch size, but the best loading time and ordering heuristic for the best time overall with all optimization. This is probably an overkill solution, but will give us the best results and overview into the problem at hand.")
+    printer.getDocumentWriter().addParagraph("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch")
+    printer.getDocumentWriter().addParagraph("\n\nThe figure below shows the optimal time for each batch size, with the most optimal loading time and ordering heuristic. NOTE: The optimal solution is likely to change from run to run since the simulations is run with random batchsizes each time.")
+    printer.getDocumentWriter().addPicture("allTimeBest.png", 6)
     et = time.time()
     elapsed_time = round(et - st, 2)
     print('Execution time:', elapsed_time, 'seconds')
     printer.getDocumentWriter().addParagraph("Execution time for the whole optimization process: " + str(elapsed_time) + " seconds, ran with a good computer")
     
-#optimization()
-st = time.time()
-results, allTimeBest, batchSize = task_7()
-print("The all time best solution is with total time: " + str((allTimeBest[0])) + " and loading time between batches " + str(allTimeBest[1]) + " minutes. The optimal batch size is then " + str(batchSize) + " wafers per batch")
-#allTimeBest1 = changeOrderingHeuristicAndLoadingtimes()
-#print("The best solution for batchsize 20 is with total time: " + str(allTimeBest1[0]) + " and loading time between batches " + str(allTimeBest1[1]) + " minutes." + " and the best ordering heuristic is: Unit 1 : [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][0]]) + "] Unit 2: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][1]]) + "] Unit 3: [" + ", ".join([str(task.getId()) for task in allTimeBest1[2][2]]) + "]" )
-#worstCaseTime, simulations = task_5()
-#print("This is an example of runtime with the worst case solution. One batch is loaded into the simulation, and the next one is not loaded until the first one is finished. This is repeated until all 1000 wafers is produced. The batch sizes is random from 20 to 50 wafers per batch, and therefore some variation in time between each run. The total runtime is: " + str(worstCaseTime) + " minutes for this simulation.")
-#print("Batchsize 20: The optimal solution is with total time: " +
-#                                             str(min(simulations[0][0])) + " and loading time between batches " + str(simulations[0][1][simulations[0][0].index(min(simulations[0][0]))]) + " minutes.")
-#print("Batchsize 50: The optimal solution is with total time: " +
-#                                             str(min(simulations[1][0])) + " and loading time between batches " + str(simulations[1][1][simulations[1][0].index(min(simulations[1][0]))]) + " minutes.")
-#
-#print("Batchsize 20: The optimal solution is with total time: " + str(min(simulations[2][0])) + " and loading time between batches " + str(
-#        simulations[2][1][simulations[2][0].index(min(simulations[2][0]))]) + " minutes. NOTE: With random batchsize, the optimal solution is likely to change from run to run.")
 
 
-et = time.time()
-elapsed_time = round(et - st, 2)
-print('Execution time:', elapsed_time, 'seconds')
 # 10. Main
 # --------
 
 
 def main():
-    simulation = Simulation(1000)
-    perm = (simulation.getProductionLine().generate_task_permutations()[280])
-    simulation.getProductionLine().setUnitsOrderingHeuristic(perm)
-    print(simulation.getProductionLine().getUnitsOrderingHeuristic())
-    # Task_5()
-    simulation.createBatches()
-    simulation.runSimulation()
-    # worstCase()
+    task_4()
+main()
 
-    # sim.printAllBuffers()
-
-    # sim.printAllBuffers()
-
-#main()
-
-# task_4_AllBatches()
