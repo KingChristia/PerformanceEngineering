@@ -293,7 +293,11 @@ class Simulation:
     def task5(self):
         instances = []      
 
-
+        """
+        SKJALG! JEG HAR LAGET EN FUNKSJON SOM FINNER INTERMEDIATE GATE FRA KODEN! LES UT KOMMENTARENE UNDER HVIS DU SKAL JOBBE VIDERE
+        HAR LAGET GRUNNOPPSETTET FOR Å HENTE UT FRA CSV FILEN! 
+        
+        """
         data = pd.read_csv('results.csv')
         
             
