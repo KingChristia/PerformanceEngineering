@@ -175,6 +175,8 @@ class PERTdiagram:
         self.calculatActualDuration()
         self.print_all_tasks()
         self.printDurations()
+        gate_task_id, gate_index = self.find_intermediate_gate()
+        print(f"Intermediate gate can be placed after Task {gate_task_id} at index {gate_index} in the critical path.")
 
     def calculatActualDuration(self):
         self.setRiskfactor()
@@ -209,6 +211,7 @@ class PERTdiagram:
                 task.LS = round(task.LF - task.duration, 2)
 
     def findCriticalPath(self):
+        self.criticalPath.clear()
         for task in self.tasks:
             task.slack = task.LS - task.ES
             if task.slack == 0:
@@ -216,8 +219,7 @@ class PERTdiagram:
                 self.criticalPath.append(task)
             else:
                 task.critical = False
-                if task in self.criticalPath:
-                    self.criticalPath.remove(task)
+                
 
     def classifyProject(self):
         if self.actualduration <= self.modeduration * 1.05:
@@ -226,6 +228,18 @@ class PERTdiagram:
             self.category = "Acceptable"
         else:
             self.category = "Failed"
+            
+    def find_intermediate_gate(self):
+        half_duration = self.modeduration / 2
+        print("Half duration:", half_duration)
+        cumulative_duration = 0
+        print([task.id for task in self.criticalPath])
+        
+        for i, task in enumerate(self.criticalPath):
+            cumulative_duration += task.duration
+            if cumulative_duration >= half_duration:
+                return task.id, i
+        return None, None
 
     def printCriticalPath(self):
         print("Critical Path:")
@@ -272,7 +286,7 @@ class Simulation:
         print(results_df['Duration'].describe())
         print('Project result counts:')
         print(results_df['Project Result'].value_counts())
-        self.task5()
+        #self.task5()
 
     def task5(self):
         instances = []      
@@ -299,7 +313,8 @@ def main():
     pert.collectProjectFromExcel('Warehouse.xlsx', 'Warehouse')
     # pert.collectProjectFromExcel('Villa.xlsx','Villa')
     pert.calculateDurations()
-    sim = Simulation(1000)
+    sim = Simulation(5)
+    sim.run()
     sim.task4()
     print(pert.classifyProject())
     
