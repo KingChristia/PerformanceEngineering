@@ -83,6 +83,7 @@ class PERTdiagram:
         self.longestduration = 0
         self.riskfactor = 0
         self.actualduration = 0
+        self.intermediategate = []
 
     def addTask(self, task):
         self.tasks.append(task)
@@ -238,6 +239,7 @@ class PERTdiagram:
         for i, task in enumerate(self.criticalPath):
             cumulative_duration += task.duration
             if cumulative_duration >= half_duration:
+                self.intermediategate = task
                 return task.id, i
         return None, None
 
@@ -291,11 +293,15 @@ class Simulation:
     def task5(self):
         instances = []      
 
-        for _ in range(100):
-            risk_factor = random.choice([0.8, 1.0, 1.2, 1.4])
-            early_completion_dates = [random.randint(1, 20), random.randint(21, 40), random.randint(41, 60)]
-            project_class = random.choice(['successful', 'unsuccessful'])
-            project_duration = random.randint(60, 120)
+
+        data = pd.read_csv('results.csv')
+        
+            
+        for i in range(data['Risk Factor']):#Range er for antall rader i csv
+            risk_factor = data['Risk Factor']#Hentes ut fra CSV 
+            early_completion_dates = 0#Må regnes ut fra upstream fra Intermediate gate
+            project_class = 0  #Hentes ut fra CSV
+            project_duration =  0 #Hentes ut fra CSV
             
             instance = {
                 'risk_factor': risk_factor,
