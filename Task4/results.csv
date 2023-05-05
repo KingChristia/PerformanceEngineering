@@ -1,6 +1,6 @@
-Risk Factor,Duration,Project Result
-1.2,19.16,Acceptable
-1.4,21.43,Failed
-1.4,19.49,Acceptable
-1.4,19.3,Acceptable
-1.2,18.68,Acceptable
+Risk Factor,Early Completion Dates,Project Result
+0.8,"[0, 6, 4, 9, 9, 10, 13, 17, 22, 23, 26, 26]",Acceptable
+1.2,"[0, 6, 4, 9, 9, 10, 13, 17, 22, 23, 26, 26]",Failed
+1.4,"[0, 6, 4, 9, 9, 10, 13, 17, 22, 23, 26, 26]",Successful
+1.0,"[0, 6, 4, 9, 9, 10, 13, 17, 22, 23, 26, 26]",Acceptable
+0.8,"[0, 6, 4, 9, 9, 10, 13, 17, 22, 23, 26, 26]",Successful

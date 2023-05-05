@@ -3,6 +3,11 @@
 import pandas as pd
 import random
 import numpy
+import pydot
+import networkx as nx
+import matplotlib.pyplot as plt
+import pygraphviz as pgv
+
 
 
 class Task:
@@ -83,11 +88,20 @@ class PERTdiagram:
         self.longestduration = 0
         self.riskfactor = 0
         self.actualduration = 0
+        self.earlyCompletionDates = []
         self.intermediategate = []
 
     def addTask(self, task):
         self.tasks.append(task)
+        
+    def setEarlyCompletionDates(self):
+        self.earlyCompletionDates = []
+        for task in self.tasks:
+            self.earlyCompletionDates.append(task.EF)
 
+    def getEarlyCompletionDates(self):
+        return self.earlyCompletionDates
+    
     def setRiskfactor(self):
         rf = random.choice([0.8, 1.0, 1.2, 1.4])
         for task in self.tasks:
@@ -164,27 +178,30 @@ class PERTdiagram:
         for task in self.tasks:
             task.setDuration(task.min)
         self.calculate()
-        self.minduration = self.find_task_by_id('End').getLF()
+        self.minduration = self.find_task_by_id('Completion').getLF()
         for task in self.tasks:
             task.setDuration(task.mode)
         self.calculate()
-        self.modeduration = self.find_task_by_id('End').getLF()
+        self.modeduration = self.find_task_by_id('Completion').getLF()
         for task in self.tasks:
             task.setDuration(task.max)
         self.calculate()
-        self.maxduration = self.find_task_by_id('End').getLF()
+        self.maxduration = self.find_task_by_id('Completion').getLF()
+        self.setEarlyCompletionDates()
         self.calculatActualDuration()
         self.print_all_tasks()
         self.printDurations()
-        gate_task_id, gate_index = self.find_intermediate_gate()
-        print(f"Intermediate gate can be placed after Task {gate_task_id} at index {gate_index} in the critical path.")
+        self.gate_task_id, self.gate_index = self.find_intermediate_gate()
+        print(f"Intermediate gate can be placed after Task {self.gate_task_id} at index {self.gate_index} in the critical path.")
+
+        
 
     def calculatActualDuration(self):
         self.setRiskfactor()
         for task in self.tasks:
             task.setNewmode()
         self.calculate()
-        self.actualduration = self.find_task_by_id('End').getLF()
+        self.actualduration = self.find_task_by_id('Completion').getLF()
 
     def calculate(self):
         self.forwardPass()
@@ -251,7 +268,47 @@ class PERTdiagram:
     def print_all_tasks(self):
         for task in self.tasks:
             print(task)
+            
 
+    def create_and_visualize_graph(self):
+        G = nx.DiGraph()
+        
+        # Add nodes
+        for task in self.tasks:
+            G.add_node(task.id, label=task.id)
+            
+        # Add edges
+        for task in self.tasks:
+            for predecessor in task.predecessors:
+                G.add_edge(predecessor.id, task.id)
+        
+        # Visualize the graph
+        pos = nx.spring_layout(G)
+        nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight='bold')
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        
+        plt.show()
+
+    def create_and_visualize_graph_with_depth(self):
+        A = pgv.AGraph(directed=True, strict=True, ranksep='1.5', rankdir='LR')
+
+        # Add nodes
+        for task in self.tasks:
+            A.add_node(task.id, label=task.id, shape='circle', style='filled', fillcolor='skyblue')
+
+        # Add edges
+        for task in self.tasks:
+            for predecessor in task.predecessors:
+                A.add_edge(predecessor.id, task.id)
+
+        # Draw the graph
+        A.layout(prog='dot')
+        A.draw('graph_with_depth.png')
+
+        # Display the graph
+        from IPython.display import Image
+        return Image(filename='graph_with_depth.png')
     def printDurations(self):
         print(
             f"Shortest duration: {self.minduration}, Mode duration: {self.modeduration}, Actual duration: {self.actualduration} Longest duration: {self.maxduration}")
@@ -262,16 +319,19 @@ class Simulation:
     def __init__(self, simulations) -> None:
         self.simulations = simulations
 
-    def run(self):
+    def run(self, simulationFile):
         PD = PERTdiagram()
         results_df = pd.DataFrame(
-            columns=['Risk Factor', 'Duration', 'Project Result'])
-        PD.collectProjectFromExcel('Warehouse.xlsx', 'Warehouse')
+            columns=['Risk Factor', 'Early Completion Dates', 'Project Result'])
+        PD.collectProjectFromExcel(simulationFile, 'Villa')
         for sim in range(self.simulations):
             PD.calculateDurations()
             PD.classifyProject()
+            earlyCompletion = PD.getEarlyCompletionDates()
+            print(earlyCompletion)
+            PD.criticalPath[self.gate_index]
             new_row = {'Risk Factor': PD.riskfactor,
-                       'Duration': PD.actualduration,
+                       'Early Completion Dates': earlyCompletion,
                        'Project Result': PD.category}
 
             results_df = pd.concat(
@@ -285,19 +345,13 @@ class Simulation:
         # Print the statistics of the durations and project results
         print('Duration statistics:')
         # KANSKJE Vi GJØR DET SELV SENERE
-        print(results_df['Duration'].describe())
+        print(results_df['Early Completion Dates'].describe())
         print('Project result counts:')
         print(results_df['Project Result'].value_counts())
         #self.task5()
 
     def task5(self):
         instances = []      
-
-        """
-        SKJALG! JEG HAR LAGET EN FUNKSJON SOM FINNER INTERMEDIATE GATE FRA KODEN! LES UT KOMMENTARENE UNDER HVIS DU SKAL JOBBE VIDERE
-        HAR LAGET GRUNNOPPSETTET FOR Å HENTE UT FRA CSV FILEN! 
-        
-        """
         data = pd.read_csv('results.csv')
         
             
@@ -307,11 +361,12 @@ class Simulation:
             project_class = 0  #Hentes ut fra CSV
             project_duration =  0 #Hentes ut fra CSV
             
+            
             instance = {
-                'risk_factor': risk_factor,
                 'early_completion_dates': early_completion_dates,
                 'project_class': project_class,
-                'project_duration': project_duration
+                'risk_factor': risk_factor,
+                'project_duration': project_duration,
             }
             instances.append(instance)
         
@@ -320,13 +375,15 @@ class Simulation:
 
 def main():
     pert = PERTdiagram()
-    pert.collectProjectFromExcel('Warehouse.xlsx', 'Warehouse')
-    # pert.collectProjectFromExcel('Villa.xlsx','Villa')
+    #pert.collectProjectFromExcel('Warehouse.xlsx', 'Warehouse')
+    pert.collectProjectFromExcel('Villa.xlsx','Villa')
     pert.calculateDurations()
-    sim = Simulation(5)
-    sim.run()
-    sim.task4()
-    print(pert.classifyProject())
+
+    pert.create_and_visualize_graph_with_depth()
+    #sim = Simulation(5)
+    #sim.run('Warehouse.xlsx')
+    #sim.task4()
+    #print(pert.classifyProject())
     
 
 
