@@ -224,12 +224,9 @@ class PERTdiagram:
     def createAndVisualizeGraphWithDepth(self, filename):
         A = pgv.AGraph(directed=True, strict=True, ranksep='1.5', rankdir='LR')
 
-        # Add nodes
+        #add nodes
         for task in self.tasks:
-            
             if task == self.getTasks()[self.getIntermediateGate()]:
-                print(task.getId())
-                print(self.getIntermediateGate())
                 A.add_node(task.getId(), label=task.getId() + 'Gate', shape='circle',
                            style='filled', fillcolor='red')
             else:

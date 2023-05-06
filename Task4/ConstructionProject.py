@@ -26,7 +26,7 @@ class Simulation:
 
     def __init__(self, simulations, excelFile, filePage) -> None:
         self.simulations = simulations
-        self.excelFile = excelFile
+        self.excelFile = excelFile + '.xlsx'
         self.PERTdiagram = PERTDiagram.PERTdiagram()
         self.filePage = filePage
         self.xtrain = []
@@ -36,6 +36,11 @@ class Simulation:
         self.trainset = []
         self.testset = []
         self.printer = Printer.Printer(sys.stdout)
+        self.initializeTasks()
+
+    def initializeTasks(self):
+        self.getPERTdiagram().collectProjectFromExcel(
+            self.getExcelfile(), self.getFilePage())
 
     def setSimulations(self, simulations):
         self.simulations = simulations
@@ -103,11 +108,11 @@ class Simulation:
     def getPrinter(self):
         return self.printer
 
-    #Tasks
+    # Tasks
 
     # Task 4
     def Task4(self, filename):
-        resultsDF = pd.read_csv(filename)
+        resultsDF = pd.read_csv(filename + '.csv')
         actualdurationsummary = resultsDF['Actual duration'].describe()
         self.getPrinter().printTask4(actualdurationsummary, resultsDF)
 
@@ -127,14 +132,12 @@ class Simulation:
         svrmse = self.supportVectorRegression()
         self.getPrinter().printTask6(lrmse, dtrmse, svrmse)
 
-
-    #Methods
+    # Methods
 
     def createCSV(self, filename, intermediateGatePosition):
         resultsDF = pd.DataFrame(columns=[
                                  'Risk Factor', 'Early Completion Dates', 'Project Result', 'Actual duration'])
-        self.getPERTdiagram().collectProjectFromExcel(
-            self.getExcelfile(), self.getFilePage())
+
         for sim in range(self.getSimulations()):
             self.getPERTdiagram().calculateDurations()
             self.getPERTdiagram().setIntermediateGate(intermediateGatePosition)
@@ -145,15 +148,15 @@ class Simulation:
                       'Actual duration': self.getPERTdiagram().getActualDuration()
                       }
             # Adds the data to the dataframe
-            resultsDF = pd.concat([resultsDF, pd.DataFrame([newrow])], ignore_index=True)
+            resultsDF = pd.concat(
+                [resultsDF, pd.DataFrame([newrow])], ignore_index=True)
         # Saves the dataframe to a csv file
-        resultsDF.to_csv(filename, index=False)
-
-
+        resultsDF.to_csv(filename + ".csv", index=False)
+        self.getPERTdiagram().createAndVisualizeGraphWithDepth(filename + '.png')
 
     def createTrainingData(self, filename):
         instances = []
-        data = pd.read_csv(filename)
+        data = pd.read_csv(filename + '.csv')
 
         for i in range(data['Risk Factor'].count()):
             riskfactor = data['Risk Factor'][i]
@@ -183,6 +186,7 @@ class Simulation:
         self.setYtest([instance['project class']
                       for instance in self.getTestset()])
 
+
     def createDecisionTree(self):
         # Decision Tree Classifier
         dtclf = DecisionTreeClassifier()
@@ -193,7 +197,7 @@ class Simulation:
         return dtaccuracy
 
     def createKNN(self):
-        knnclf = KNeighborsClassifier(nneighbors=3)
+        knnclf = KNeighborsClassifier(n_neighbors=9)
         knnclf.fit(self.getXtrain(), self.getYtrain())
 
         ypred = knnclf.predict(self.getXtest())
@@ -215,9 +219,9 @@ class Simulation:
         ytrain = [instance['project duration']
                   for instance in self.getTrainset()]
         xtest = [instance['early completion dates']
-                 for instance in self.getTrainset()]
+                 for instance in self.getTestset()]
         ytest = [instance['project duration']
-                 for instance in self.getTrainset()]
+                 for instance in self.getTestset()]
 
         return xtrain, ytrain, xtest, ytest
 
@@ -246,7 +250,7 @@ class Simulation:
         return svrmse
 
     # numberOfSimulations is a list of the number of simulations we want to run
-    def multipleSimulations(self, numberOfSimulations, filenamecsv, filename, sheet):
+    def multipleSimulations(self, numberOfSimulations, filenamecsv, filename, sheet, intermediateGatePosition):
         dtaccuracylist = []
         knnaccuracylist = []
         svmaccuracylist = []
@@ -257,11 +261,22 @@ class Simulation:
 
         for number in numberOfSimulations:
             simulation = Simulation(number, filename, sheet)
+            self.getPERTdiagram().setIntermediateGate(intermediateGatePosition)
             simulation.createCSV(
                 filenamecsv, self.getPERTdiagram().getIntermediateGate())
 
-            dtaccuracy, knnaccuracy, svmaccuracy, lrmse, dtrmse, svrmse = simulation.createTrainingData(
-                filenamecsv)
+            #Creates the simulation data
+            simulation.createTrainingData(filenamecsv)
+            
+            dtaccuracy = simulation.createDecisionTree()
+            knnaccuracy = simulation.createKNN()
+            svmaccuracy = simulation.createSVM()
+            
+            lrmse = simulation.linearRegression()
+            dtrmse = simulation.decisionTreeClassifier()
+            svrmse = simulation.supportVectorRegression()
+            
+            
             simulationlist.append(number)
             dtaccuracylist.append(dtaccuracy)
             knnaccuracylist.append(knnaccuracy)
@@ -301,11 +316,11 @@ class Simulation:
 
 
 def main():
-    sim = Simulation(10, 'Villa.xlsx', 'Villa')
-    sim.createCSV('results.csv', 36)
-    sim.createCSV('earlyresults.csv', 12)
-    sim.getPERTdiagram().createAndVisualizeGraphWithDepth('lateresults.png')
-    sim.multipleSimulations([100, 500, 1000, 2000],'results.csv', 'Villa.xlsx', 'Villa')
+    sim = Simulation(10, 'Villa', 'Villa')
+    sim.createCSV('lateresults', 36)
+    sim.createCSV('earlyresults', 12)
+    sim.multipleSimulations([100, 500, 1000, 2000],
+                            'multipleresults', 'Villa', 'Villa', 36)
 
 
 main()
