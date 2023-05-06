@@ -177,7 +177,7 @@ class PERTdiagram:
         self.calculatActualDuration()
         self.setEarlyCompletionDates()
         # self.printer.print_all_tasks(self.getTasks())
-        self.printer.printDurations(self)
+        #self.printer.printDurations(self)
 
     def calculatActualDuration(self):
         self.setRiskfactor()

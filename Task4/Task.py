@@ -141,4 +141,4 @@ class Task:
 
 
     def __str__(self):
-        return f"Task {self.getId()}, {self.getDescription()}, duration: {self.getDuration()}, predecessors: {[predecessor.getId() for predecessor in self.getPredecessors()]}, successors: {[sucsessors.getId() for sucsessors in self.getSuccessors()]} , ES: {self.getES()}, EF: {self.getEF()}, LS: {self.getLS()}, LF: {self.getLF()}, slack: {self.getSlack()}, critical: {self.getCritical()}, riskfactor: {self.getRiskfactor()}"
+        return f"Task {self.getId()}, {self.getDescription()}, duration: {round(self.getDuration())}, predecessors: {[predecessor.getId() for predecessor in self.getPredecessors()]}, successors: {[sucsessors.getId() for sucsessors in self.getSuccessors()]} , ES: {self.getES()}, EF: {self.getEF()}, LS: {self.getLS()}, LF: {self.getLF()}, slack: {self.getSlack()}, critical: {self.getCritical()}, riskfactor: {self.getRiskfactor()}"

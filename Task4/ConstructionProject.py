@@ -111,7 +111,7 @@ class Simulation:
     # Tasks
 
     # Task 4
-    def Task4(self, filename):
+    def task4(self, filename):
         resultsDF = pd.read_csv(filename + '.csv')
         actualdurationsummary = resultsDF['Actual duration'].describe()
         self.getPrinter().printTask4(actualdurationsummary, resultsDF)
@@ -314,13 +314,56 @@ class Simulation:
         plt.savefig("regressionMses.png")  # Save the second plot as a PNG file
         plt.clf()  # Clear the current figure if you want to create more plots
 
-
-def main():
-    sim = Simulation(10, 'Villa', 'Villa')
+def task1to3():
+    sim = Simulation(1, 'Warehouse', 'Warehouse')
+    print("\n\nStart of simulation Warehouse\n\n")
+    sim.getPERTdiagram().calculateDurations()
+    
+    sim.getPrinter().printAllTasks(sim.getPERTdiagram().getTasks())
+    sim.getPrinter().printDurations(sim.getPERTdiagram())
+    sim.getPrinter().printCriticalPath(sim.getPERTdiagram())
+    print("\n\n Start of simulation Villa\n\n")
+    sim2 = Simulation(1, 'Villa', 'Villa')
+    sim2.getPERTdiagram().calculateDurations()
+    
+    sim2.getPrinter().printAllTasks(sim2.getPERTdiagram().getTasks())
+    sim2.getPrinter().printDurations(sim2.getPERTdiagram())
+    sim2.getPrinter().printCriticalPath(sim2.getPERTdiagram())
+    
+def task4to6():
+    sim = Simulation(1000, 'Villa', 'Villa')
     sim.createCSV('lateresults', 36)
     sim.createCSV('earlyresults', 12)
-    sim.multipleSimulations([100, 500, 1000, 2000, 4000, 8000, 16000, 32000],
-                            'multipleresults', 'Villa', 'Villa', 36)
+    
+    print("\n\nStatistics for early gate")
+    print("-------------------------")
+    sim.task4('earlyresults')
+    print("\n\nMachine Learning for classification early gate")
+    print("----------------------------------------------")
+    sim.task5('earlyresults')
+    print("\n\nMachine Learning for regression early gate")
+    print("------------------------------------------")
+    sim.task6('earlyresults')
+    print("\n\n\n\n")
+    print("\nStatistics for late gate")
+    print("------------------------")
+    sim.task4('lateresults')
+    print("\n\nMachine Learning for classification late gate")
+    print("---------------------------------------------")
+    sim.task5('lateresults')
+    print("\n\nMachine Learning for regression late gate")
+    print("-----------------------------------------")
+    sim.task6('lateresults')
+    print("\n\n")
+    
+    
+    #This method can be used to run multiple simulations and create plots to show how the ML algorithms perform with different amount of simulations
+    
+    #sim.multipleSimulations([100, 500, 1000, 2000, 4000, 8000, 16000, 32000],
+    #                       'multipleresults', 'Villa', 'Villa', 36)
+def main():
+    task1to3()
+    task4to6()
 
 
 main()
