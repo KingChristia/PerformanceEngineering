@@ -197,7 +197,7 @@ class Simulation:
         return dtaccuracy
 
     def createKNN(self):
-        knnclf = KNeighborsClassifier(n_neighbors=9)
+        knnclf = KNeighborsClassifier(n_neighbors=5)
         knnclf.fit(self.getXtrain(), self.getYtrain())
 
         ypred = knnclf.predict(self.getXtest())
@@ -319,7 +319,7 @@ def main():
     sim = Simulation(10, 'Villa', 'Villa')
     sim.createCSV('lateresults', 36)
     sim.createCSV('earlyresults', 12)
-    sim.multipleSimulations([100, 500, 1000, 2000],
+    sim.multipleSimulations([100, 500, 1000, 2000, 4000, 8000, 16000, 32000],
                             'multipleresults', 'Villa', 'Villa', 36)
 
 
