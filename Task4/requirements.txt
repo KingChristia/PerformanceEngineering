@@ -4,3 +4,5 @@ pydot
 scikit-learn
 pygraphviz
 networkx
+matplotlib
+IPython
