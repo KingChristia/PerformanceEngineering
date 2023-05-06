@@ -186,7 +186,6 @@ class Simulation:
         self.setYtest([instance['project class']
                       for instance in self.getTestset()])
 
-
     def createDecisionTree(self):
         # Decision Tree Classifier
         dtclf = DecisionTreeClassifier()
@@ -265,18 +264,17 @@ class Simulation:
             simulation.createCSV(
                 filenamecsv, self.getPERTdiagram().getIntermediateGate())
 
-            #Creates the simulation data
+            # Creates the simulation data
             simulation.createTrainingData(filenamecsv)
-            
+
             dtaccuracy = simulation.createDecisionTree()
             knnaccuracy = simulation.createKNN()
             svmaccuracy = simulation.createSVM()
-            
+
             lrmse = simulation.linearRegression()
             dtrmse = simulation.decisionTreeClassifier()
             svrmse = simulation.supportVectorRegression()
-            
-            
+
             simulationlist.append(number)
             dtaccuracylist.append(dtaccuracy)
             knnaccuracylist.append(knnaccuracy)
@@ -314,27 +312,30 @@ class Simulation:
         plt.savefig("regressionMses.png")  # Save the second plot as a PNG file
         plt.clf()  # Clear the current figure if you want to create more plots
 
+
 def task1to3():
     sim = Simulation(1, 'Warehouse', 'Warehouse')
     print("\n\nStart of simulation Warehouse\n\n")
     sim.getPERTdiagram().calculateDurations()
-    
+
     sim.getPrinter().printAllTasks(sim.getPERTdiagram().getTasks())
     sim.getPrinter().printDurations(sim.getPERTdiagram())
     sim.getPrinter().printCriticalPath(sim.getPERTdiagram())
     print("\n\n Start of simulation Villa\n\n")
     sim2 = Simulation(1, 'Villa', 'Villa')
     sim2.getPERTdiagram().calculateDurations()
-    
+
     sim2.getPrinter().printAllTasks(sim2.getPERTdiagram().getTasks())
     sim2.getPrinter().printDurations(sim2.getPERTdiagram())
     sim2.getPrinter().printCriticalPath(sim2.getPERTdiagram())
-    
+
+
 def task4to6():
     sim = Simulation(1000, 'Villa', 'Villa')
+    # Proposed intermediate gates: [1, 5, 9, 12, 13, 14, 15, 18, 23, 28, 36, 37, 45, 49, 50, 59, 60, 61]
     sim.createCSV('lateresults', 36)
     sim.createCSV('earlyresults', 12)
-    
+
     print("\n\nStatistics for early gate")
     print("-------------------------")
     sim.task4('earlyresults')
@@ -355,12 +356,13 @@ def task4to6():
     print("-----------------------------------------")
     sim.task6('lateresults')
     print("\n\n")
-    
-    
-    #This method can be used to run multiple simulations and create plots to show how the ML algorithms perform with different amount of simulations
-    
-    #sim.multipleSimulations([100, 500, 1000, 2000, 4000, 8000, 16000, 32000],
+
+    # This method can be used to run multiple simulations and create plots to show how the ML algorithms perform with different amount of simulations
+
+    # sim.multipleSimulations([100, 500, 1000, 2000, 4000, 8000, 16000, 32000],
     #                       'multipleresults', 'Villa', 'Villa', 36)
+
+
 def main():
     task1to3()
     task4to6()
