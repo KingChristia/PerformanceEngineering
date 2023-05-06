@@ -222,6 +222,9 @@ class PERTdiagram:
         return self.category
 
     def createAndVisualizeGraphWithDepth(self, filename):
+        return
+        #The code below is used to create all the images for the PERT Diagram.
+        #
         A = pgv.AGraph(directed=True, strict=True, ranksep='1.5', rankdir='LR')
 
         #add nodes
