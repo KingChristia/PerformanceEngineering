@@ -96,7 +96,7 @@ class PERTdiagram:
 
     # Methods
 
-    def get_description_column_name(self, df):
+    def getDescriptionColumnName(self, df):
         if 'Description' in df.columns:
             return 'Description'
         elif 'Descriptions' in df.columns:
@@ -107,7 +107,7 @@ class PERTdiagram:
 
     def collectProjectFromExcel(self, excelFile, sheetname):
         df = pd.read_excel(excelFile, sheetname, header=0, index_col=None)
-        description_column = self.get_description_column_name(df)
+        description_column = self.getDescriptionColumnName(df)
 
         for index, row in df.iterrows():
             if row.isnull().all():
@@ -135,24 +135,24 @@ class PERTdiagram:
                 ', ') if not isinstance(row['Predecessors'], float) else []
             for predecessor_id in predecessors:
                 if predecessor_id:  # Avoid empty predecessor strings
-                    self.connect_tasks(predecessor_id, task_id)
+                    self.connectTasks(predecessor_id, task_id)
 
-    def connect_tasks(self, predecessor, successor):
-        predecessor_task = self.find_task_by_id(predecessor)
-        successor_task = self.find_task_by_id(successor)
+    def connectTasks(self, predecessor, successor):
+        predecessor_task = self.findTaskById(predecessor)
+        successor_task = self.findTaskById(successor)
         if predecessor_task and successor_task:
             predecessor_task.addSuccessor(successor_task)
             successor_task.addPredecessor(predecessor_task)
 
-    def disconnect_tasks(self, predecessor, successor):
-        predecessor_task = self.find_task_by_id(predecessor)
-        successor_task = self.find_task_by_id(successor)
+    def disconnectTasks(self, predecessor, successor):
+        predecessor_task = self.findTaskById(predecessor)
+        successor_task = self.findTaskById(successor)
 
         if predecessor_task and successor_task:
             predecessor_task.removeSuccessor(successor_task)
             successor_task.removePredecessor(predecessor_task)
 
-    def find_task_by_id(self, task_id):
+    def findTaskById(self, task_id):
         for task in self.getTasks():
             if task.getId() == task_id:
                 return task
@@ -162,18 +162,18 @@ class PERTdiagram:
         for task in self.getTasks():
             task.setDuration(task.getMin())
         self.calculate()
-        self.setShortestDuration(self.find_task_by_id('Completion').getLF(
-        ) if self.find_task_by_id('Completion') else self.find_task_by_id('End').getLF())
+        self.setShortestDuration(self.findTaskById('Completion').getLF(
+        ) if self.findTaskById('Completion') else self.findTaskById('End').getLF())
         for task in self.tasks:
             task.setDuration(task.getMode())
         self.calculate()
-        self.setModeDuration(self.find_task_by_id('Completion').getLF(
-        ) if self.find_task_by_id('Completion') else self.find_task_by_id('End').getLF())
+        self.setModeDuration(self.findTaskById('Completion').getLF(
+        ) if self.findTaskById('Completion') else self.findTaskById('End').getLF())
         for task in self.tasks:
             task.setDuration(task.getMax())
         self.calculate()
-        self.setLongestDuration(self.find_task_by_id('Completion').getLF(
-        ) if self.find_task_by_id('Completion') else self.find_task_by_id('End').getLF())
+        self.setLongestDuration(self.findTaskById('Completion').getLF(
+        ) if self.findTaskById('Completion') else self.findTaskById('End').getLF())
         self.calculatActualDuration()
         self.setEarlyCompletionDates()
         # self.printer.print_all_tasks(self.getTasks())
@@ -184,8 +184,8 @@ class PERTdiagram:
         for task in self.getTasks():
             task.setNewmode()
         self.calculate()
-        self.setActualDuration(self.find_task_by_id('Completion').getLF(
-        ) if self.find_task_by_id('Completion') else self.find_task_by_id('End').getLF())
+        self.setActualDuration(self.findTaskById('Completion').getLF(
+        ) if self.findTaskById('Completion') else self.findTaskById('End').getLF())
 
     def calculate(self):
         self.forwardPass()
