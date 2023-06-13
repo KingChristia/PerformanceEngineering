@@ -76,19 +76,19 @@ First method, randomContainer() returns a new Container object, that is randomly
 
 randomContainers() returns a set of x unique containers.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/2.PNG)
 
 ### Task 4
 
 writeContainersToFile(containers) takes in a list, and writes the list to file, by iterating through the list, and using getters to get information needed. This is saved in a separated .csv file
 
-![](readmeImg/task1.PNG)
+![](readmeImg/3.PNG)
 
 This is a screenshot of the .csv file. 
 
 readContainersFromFile() will iterate line to line through the file, and create container objects in the returned list, containers.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/4.PNG)
 
 ### Task 5
 
@@ -97,12 +97,18 @@ It also contains a containers dictionary to more easily find container objects.�
 
 containerBay is a 3D representation of the loading zone in the Ship. I created methods to fulfill the different restrictions, ref a 40 foot container cant be loaded on a single 20 foot. 
 
-![](readmeImg/task1.PNG)
+![](readmeImg/5.PNG)
 
 In a Ship that is 23 Long, 22 Width and 18 height, this is the representation of One layer in the ship, unloaded:
 
 Every 0 represents a free space in the ship.
-![](readmeImg/task1.PNG)
+![](readmeImg/6.PNG)
+
+printNice is the method that prints out the ship
+
+To find a container on the ship, we used the dictionary for fast lookup times, and returned the Container object, with the id given, else returns None if it is not in the Ship. We can also use this to get the position of the container on the Ship with the getPosition() method of the returned container.
+![](readmeImg/7.PNG)
+
 
 The Ship also has appropriate getters, but it will not be shown in this documentation.
 
@@ -124,26 +130,38 @@ The function placeFirstAvailableSpot, takes in a container, and number of cranes
 
 The algorithm will find the first available spot to place a container in the ship, starting from the left corner on the ship. It will maximize the amount of containers that can be placed on the ship, regarding if its 40 foot, or 20 foot.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/8.PNG)
+
+It will check the last layer and the last position, to check if it's full.
+
+![](readmeImg/9.PNG)
+
+If we are able to place the container, addContainerToDict will run, and add the container to the Dictionary.
+
+![](readmeImg/10.PNG)
+
+These methods will show that the methods over will work.
+![](readmeImg/11.PNG)
+
 
 Since it places the heaviest containers low, it will mostly only contain 40 foot long containers.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/12.PNG)
 
 
 To remove a container from the ship, we need to use removeContainerFromShip, and it needs the ID to the container.
 
 If it exist in the ship, it will remove it from the dictionary, and set the position to zero in the map
 
-![](readmeImg/task1.PNG)
+![](readmeImg/13.PNG)
 
 Tried to make a method to remove the containers above, but it was too complicated to do with this implementation of the Ship. The containers can still be removed in correct order, but it needs to use the method unloadContainersToSet, and use that to get the correct order to remove them.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/14.PNG)
 
 
 This unimplemented method does not work optimal because of the placement of containers. ( part of removeContainerFromShip method )\
-![](readmeImg/task1.PNG)
+![](readmeImg/15.PNG)
 
 
 The image to the right describes the problem of unloading a container. Almost all containers above need to be removed, and not smart in real life. But since this is a simulation, it is okay. One of my assumptions is that you need to remove all containers, or remove them in reversed placed order.
@@ -152,10 +170,10 @@ The image to the right describes the problem of unloading a container. Almost al
 
 Very familiar to the previous read/write, but it only writes containers loaded on the Ship, from the getContainers method.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/16.PNG)
 
 
-![](readmeImg/task1.PNG)
+![](readmeImg/17.PNG)
 
 ### Task 7
 
@@ -165,57 +183,57 @@ unloadContainersToSet will return an orderedList.
 
 They will follow all the constraints by using addContainer method, and removeContainer.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/18.PNG)
 
 
 ### Task 8
 
 Loading containers from either the list or the dictionary, then sort them after weight before adding them to the list
 
-![](readmeImg/task1.PNG)
+![](readmeImg/19.PNG)
 
 This method will do the same, but takes longer to load, and not needed when python has a built-in function to sort after weight.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/20.PNG)
 
 ### Task 9
 
 Total weight of containers on ship:
 
-![](readmeImg/task1.PNG)
+![](readmeImg/21.PNG)
 
 Weight starboard and portside:
 
-![](readmeImg/task1.PNG)
+![](readmeImg/22.PNG)
 
 Weight front, middle and back:
 
-![](readmeImg/task1.PNG)
+![](readmeImg/23.PNG)
 
 Calculate percentage weights:
 
-![](readmeImg/task1.PNG)
+![](readmeImg/24.PNG)
 
-![](readmeImg/task1.PNG)
+
 
 ### Task 10
 
 This function will split the list of containers in x amount, S.T the heaviest containers will be placed differently, and split. This is not an optimal solution, but hard to balance the ship with my approach.
 
-![](readmeImg/task1.PNG)
+![](readmeImg/25.PNG)
 
 ### Task 11
 
 4 cranes only work with the current ship, else use 1 crane. The algorithm to split the sections is not perfect, therefore it will not work with all ship types.
 
 Loading takes :
-![](readmeImg/task1.PNG)
+![](readmeImg/26.PNG)
 
 -   Do not take into consideration that you need to sort heaviest containers first.
 
 -   Unloading takes an equal amount of time, because you can only remove all containers, or the upper ones first. (Assumption)
 
-![](readmeImg/task1.PNG)
+![](readmeImg/27.PNG)
 
 ### Task 12
 
