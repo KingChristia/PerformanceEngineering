@@ -1,1 +1,1 @@
-[Link to PDF Readme](Avanserte Verktøy - Exercise 2.pdf)
+[Link to PDF Readme](Task 2\Avanserte Verktøy - Exercise 2.pdf)
