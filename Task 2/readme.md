@@ -13,6 +13,7 @@ To ensure you can run this program, you need to use the python virtual environme
 To activate use:
 
 Windows ``source venv/Scripts/activate`` 
+
 Mac/linux ``source venv/bin/activate`` 
 
 Then run ``pip install -r requirements.txt`` 
@@ -36,6 +37,7 @@ Most of the tasks from games is made done using the class ChessGame.py
 It contains the metadata as dictionary, and all the moves as a list
 
 Moves contains Move objects from Move.py:
+
 ![](READMEIMAGES/3.PNG)
 
 Task 2 and 3 is done the same way as PGN files. This is implemented in Database.py and supports both versions. You can export to a file from ChessGame.py.
@@ -48,6 +50,7 @@ Task 4 extended the class to Database.py, and it contains most of the tasks in t
 
 ## Statistics
 Task 6 is done through DocumentWriter.py, it uses python-docx and I made my own defined methods to add Headings, Paragraphs, Pictures and Tables. It will create a Word document with the selected filename. All of the figures and tasks are done in the ChessDatabase.docx file.
+
 ![](READMEIMAGES/5.PNG)
 
 
