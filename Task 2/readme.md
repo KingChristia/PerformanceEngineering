@@ -9,17 +9,17 @@
 ## Introduction
 
 To ensure you can run this program, you need to use the python virtual environment.
+
 To activate use:
 
-● Windows ``source venv/Scripts/activate``
+Windows ``source venv/Scripts/activate`` 
+Mac/linux ``source venv/bin/activate`` 
 
-● Mac/linux ``source venv/bin/activate``
-
-Then run ``pip install -r requirements.txt``
+Then run ``pip install -r requirements.txt`` 
 
 This will install the required packages to run the application
 
-##Assumptions
+## Assumptions
 
 1. You need to run all the scripts in the requirements file to run the application
 2. You need to comment out the circular imports in Database.py and
